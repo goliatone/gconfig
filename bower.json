@@ -1,0 +1,8 @@
+{
+  "name": "gconfig.js",
+  "version": "0.1.0",
+  "main": "./dist/gconfig.min.js",
+  "ignore": [
+    "**/.*"
+  ]
+}
