@@ -19,7 +19,7 @@ define('gconfig', ['jquery'], function($) {
         namespace = namespace || options.namespace;
         var selector = options.selector.replace('::NAMESPACE::', namespace);
         var self = this;
-        console.log('Selector is %s', selector);
+        // console.log('Selector is %s', selector);
         $(selector).each(function(index, el){
             self.addMeta(el.name.replace( namespace +'-',''), el.content, namespace);
             // self.config[ element.name.replace('app-','') ] = element.content;
