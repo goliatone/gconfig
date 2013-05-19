@@ -21,6 +21,9 @@
     }
   ],
   "main": "src/gconfig",
+  "scripts": {
+    "test": "grunt test"
+  },
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
