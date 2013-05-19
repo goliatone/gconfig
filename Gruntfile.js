@@ -92,9 +92,17 @@ module.exports = function (grunt) {
             ]
         },
         karma: {
-            unit: {
+            options: {
                 configFile: 'karma.conf.js',
-                singleRun: true
+                runnerPort: 9999,
+                browsers: ['Chrome', 'Firefox']
+            },
+            unit: {
+                reporters: 'dots'
+            },
+            continuous: {
+                singleRun: true,
+                browsers: ['PhantomJS']
             }
         },
         concat: {
