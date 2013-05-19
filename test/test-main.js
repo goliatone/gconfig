@@ -1,5 +1,5 @@
 var tests = Object.keys(window.__karma__.files).filter(function (file) {
-      return /Spec\.js$/.test(file);
+      return /-spec\.js$/.test(file);
 });
 
 requirejs.config({
@@ -7,14 +7,7 @@ requirejs.config({
     baseUrl: '/base/src',
 
     paths: {
-        'jquery': '../lib/jquery',
-        'underscore': '../lib/underscore',
-    },
-
-    shim: {
-        'underscore': {
-            exports: '_'
-        }
+        'jquery': '../lib/jquery/jquery'
     },
 
     // ask Require.js to load these files (all our tests)
@@ -23,3 +16,4 @@ requirejs.config({
     // start test run, once Require.js is done
     callback: window.__karma__.start
 });
+

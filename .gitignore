@@ -5,3 +5,4 @@ dist
 node_modules
 app/components
 *.sublime-*
+.DS_Store

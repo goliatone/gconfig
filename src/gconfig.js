@@ -1,6 +1,6 @@
 /*global define:true*/
 /* jshint strict: false */
-define(['jquery'], function($) {
+define('gconfig', ['jquery'], function($) {
 
     var options = {
         //http://stackoverflow.com/questions/7602410/how-do-i-find-elements-that-contain-a-data-attribute-matching-a-prefix-using-j
@@ -10,7 +10,6 @@ define(['jquery'], function($) {
 
     var GConfig = function(config){
         $.extend(options, config || {});
-
         this.meta = {};
     };
 
