@@ -103,6 +103,10 @@ module.exports = function (grunt) {
             continuous: {
                 singleRun: true,
                 browsers: ['PhantomJS']
+            },
+            ci: {
+                singleRun: true,
+                browsers: ['PhantomJS']
             }
         },
         concat: {
