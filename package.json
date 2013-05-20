@@ -22,7 +22,7 @@
   ],
   "main": "src/gconfig",
   "scripts": {
-    "test": "grunt karma:continuous"
+    "test": "grunt karma:ci"
   },
   "dependencies": {},
   "devDependencies": {
@@ -40,7 +40,8 @@
     "grunt-karma": "~0.3.0",
     "grunt-open": "~0.2.0",
     "matchdep": "~0.1.1",
-    "grunt-google-cdn": "~0.1.1"
+    "grunt-google-cdn": "~0.1.1",
+    "markdown": "~0.4.0"
   },
   "engines": {
     "node": ">=0.8.0"
