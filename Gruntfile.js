@@ -1,6 +1,11 @@
 'use strict';
 var lrSnippet = require('grunt-contrib-livereload/lib/utils').livereloadSnippet;
-var mountFolder = function (connect, dir) {
+var mountFolder = function (connect, dir, next) {
+    if(next){
+        connect.static(require('path').resolve(dir));
+        next();
+    }
+
     return connect.static(require('path').resolve(dir));
 };
 
@@ -17,7 +22,7 @@ module.exports = function (grunt) {
     };
 
     try {
-        yeomanConfig.src = require('./component.json').appPath || yeomanConfig.src;
+        yeomanConfig.src = require('./component.json').appPath || yeomanConfig.example;
     } catch (e) {}
 
     grunt.initConfig({
@@ -38,7 +43,7 @@ module.exports = function (grunt) {
         },
         connect: {
             options: {
-                port: 9000,
+                port: 9030,
                 // Change this to '0.0.0.0' to access the server from outside.
                 hostname: 'localhost'
             },
@@ -48,7 +53,7 @@ module.exports = function (grunt) {
                         return [
                             lrSnippet,
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, yeomanConfig.src)
+                            mountFolder(connect, yeomanConfig.example)
                         ];
                     }
                 }
@@ -61,6 +66,40 @@ module.exports = function (grunt) {
                             mountFolder(connect, 'test')
                         ];
                     }
+                }
+            },
+            dev:{
+                options: {
+                    /*middleware: function (connect, res, next) {
+                        console.log('middleware ', arguments.length);
+                        return [
+                            mountFolder(connect, '.', next)
+                        ];
+                    },*/
+                    mappings: [
+                        {
+                            prefix: '/preview',
+                            src: 'preview/'
+                        },
+                        {
+                            prefix: '/',
+                            src: [ 'examples/' ]
+                        },
+                        {
+                            prefix: '/readme',
+                            src: function ( req ) {
+                                var markdown, html, style;
+
+                                markdown = grunt.file.read( 'README.md' );
+                                console.log('We are here ', markdown);
+                                html = require( 'markdown' ).markdown.toHTML( markdown );
+
+                                style = "<style>body {font-family: 'Helvetica Neue', 'Arial'; font-size: 16px; color: #333; } pre { background-color: #eee; padding: 0.5em; } hr { margin: 2em 0 }</style>";
+
+                                return style + html;
+                            }
+                        }
+                    ]
                 }
             }
         },
@@ -95,14 +134,10 @@ module.exports = function (grunt) {
             options: {
                 configFile: 'karma.conf.js',
                 runnerPort: 9999,
-                browsers: ['Chrome', 'Firefox']
+                browsers: ['Chrome']
             },
             unit: {
                 reporters: 'dots'
-            },
-            continuous: {
-                singleRun: true,
-                browsers: ['PhantomJS']
             },
             ci: {
                 singleRun: true,
@@ -154,7 +189,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test', [
         'clean:server',
         'connect:test',
-        'karma'
+        'karma:ci'
     ]);
 
     grunt.registerTask('build', [
