@@ -8,17 +8,19 @@ basePath = '';
 
 // list of files / patterns to load in the browser
 files = [
-  JASMINE,
-  JASMINE_ADAPTER,
-  REQUIRE,
-  REQUIRE_ADAPTER,
+  	JASMINE,
+  	JASMINE_ADAPTER,
+  	REQUIRE,
+  	REQUIRE_ADAPTER,
 
-  {pattern: 'lib/jquery/jquery.js', included: false},
-  {pattern: 'lib/requirejs/require.js', included: false},
-  {pattern: 'src/*.js', included: false},
-  {pattern: 'test/spec/*-spec.js', included: false},
+  	{pattern: 'lib/jquery/jquery.js', included: false},
+  	{pattern: 'lib/requirejs/require.js', included: false},
+  	{pattern: 'src/*.js', included: false},
+  	{pattern: 'test/spec/*-spec.js', included: false},
 
-  'test/test-main.js',
+  	// helpers & fixtures for jasmine-jquery
+    { pattern: 'test/helpers/*.js', included: true },
+  	'test/test-main.js',
 ];
 
 
