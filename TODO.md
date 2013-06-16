@@ -1,9 +1,10 @@
 ##TODO:
-- Add lib/* to .gitignore
-- Ensure we bower install on `before_script: bower install`
+- [ ] Add lib/* to .gitignore
+- [ ] Ensure we bower install on `before_script: bower install`
 
 Should we get rid of jQuery?
 
+```
 var metaTags=document.getElementsByTagName("meta");
 var selector = options.selector.replace('::NAMESPACE::', namespace);
 
@@ -14,3 +15,7 @@ for (var i = 0; i < metaTags.length; i++) {
         content[attr.replace( namespace +'-','')] = metaTags[i].getAttribute("content");
     }
 }
+```
+
+- [ ] Review install process. Export only gconfig, no cruft.
+- [ ] Do we need component.json or bower.json is enough?
