@@ -19,9 +19,3 @@ for (var i = 0; i < metaTags.length; i++) {
 
 - [ ] Review install process. Export only gconfig, no cruft.
 - [ ] Do we need component.json or bower.json is enough?
-
-- [ ] a task list item
-- [ ] list syntax required
-- [ ] normal **formatting**, @mentions, #1234 refs
-- [ ] incomplete
-- [x] completed
