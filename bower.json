@@ -1,5 +1,5 @@
 {
-  "name": "gconfig.js",
+  "name": "gconfig",
   "version": "0.1.0",
   "main": "./src/gconfig.js",
   "ignore": [
