@@ -3,6 +3,7 @@
 - [ ] Ensure we bower install on `before_script: bower install`
 
 Should we get rid of jQuery?
+We use `$.proxy` and `$.extend`
 
 ```
 var metaTags=document.getElementsByTagName("meta");
@@ -19,3 +20,4 @@ for (var i = 0; i < metaTags.length; i++) {
 
 - [ ] Review install process. Export only gconfig, no cruft.
 - [ ] Do we need component.json or bower.json is enough?
+

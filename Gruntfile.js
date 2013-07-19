@@ -18,7 +18,7 @@ module.exports = function (grunt) {
         name: 'gconfig',
         src: 'src',
         dist: 'dist',
-        example:'example'
+        example:'examples'
     };
 
     try {
@@ -33,10 +33,10 @@ module.exports = function (grunt) {
         watch: {
             livereload: {
                 files: [
-                    '<%= yeoman.src %>/{,*/}*.html',
-                    '{.tmp,<%= yeoman.src %>}/styles/{,*/}*.css',
-                    '{.tmp,<%= yeoman.src %>}/scripts/{,*/}*.js',
-                    '<%= yeoman.src %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+                    '<%= yeoman.example %>/{,*/}*.html',
+                    '{.tmp,<%= yeoman.example %>}/styles/{,*/}*.css',
+                    '{.tmp,<%= yeoman.example %>}/scripts/{,*/}*.js',
+                    '<%= yeoman.example %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ],
                 tasks: ['livereload']
             }
@@ -45,14 +45,15 @@ module.exports = function (grunt) {
             options: {
                 port: 9030,
                 // Change this to '0.0.0.0' to access the server from outside.
-                hostname: 'localhost'
+                hostname: 'localhost',
+                base:'./example'
             },
             livereload: {
                 options: {
                     middleware: function (connect) {
                         return [
                             lrSnippet,
-                            mountFolder(connect, '.tmp'),
+                            // mountFolder(connect, '.tmp'),
                             mountFolder(connect, yeomanConfig.example)
                         ];
                     }
@@ -63,7 +64,7 @@ module.exports = function (grunt) {
                     middleware: function (connect) {
                         return [
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'test')
+                            mountFolder(connect, 'test'),
                         ];
                     }
                 }
@@ -73,7 +74,8 @@ module.exports = function (grunt) {
                     /*middleware: function (connect, res, next) {
                         console.log('middleware ', arguments.length);
                         return [
-                            mountFolder(connect, '.', next)
+                            mountFolder(connect, yeomanConfig.example, next),
+                            // mountFolder(connect, '.', next)
                         ];
                     },*/
                     mappings: [
