@@ -5,9 +5,7 @@
 /*global beforeEach:true */
 /* jshint strict: false */
 define(['gconfig', 'jquery'], function(GConfig, $) {
-    var html = ['<meta charset="utf-8">',
-        '<meta charset=utf-8>',
-        '<meta name="app:name" content="GConfig Tester">',
+    var html = ['<meta name="app:name" content="GConfig Tester">',
         '<meta name="app:baseurl" content="http://localhost:9030">',
         '<meta name="app:default-controller" content="Controller">',
         '<meta name="widget:id" content="widgetId">'].join();
