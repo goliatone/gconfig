@@ -1,3 +1,9 @@
+/*global basePath:true, exclude:true, reporters:true, files:true*/
+/*global port:true, runnerPort:true, colors:true, logLevel:true*/
+/*global autoWatch:true, browsers:true, captureTimeout:true, singleRun:true*/
+/*global JASMINE:true, JASMINE_ADAPTER:true, REQUIRE:true, REQUIRE_ADAPTER:true*/
+/*global LOG_INFO:true*/
+
 // Karma configuration
 // Generated on Sun Mar 31 2013 21:59:25 GMT+0200 (CEST)
 
@@ -8,19 +14,19 @@ basePath = '';
 
 // list of files / patterns to load in the browser
 files = [
-  	JASMINE,
-  	JASMINE_ADAPTER,
-  	REQUIRE,
-  	REQUIRE_ADAPTER,
+    JASMINE,
+    JASMINE_ADAPTER,
+    REQUIRE,
+    REQUIRE_ADAPTER,
 
-  	{pattern: 'lib/jquery/jquery.js', included: false},
-  	{pattern: 'lib/requirejs/require.js', included: false},
-  	{pattern: 'src/*.js', included: false},
-  	{pattern: 'test/spec/*-spec.js', included: false},
+    {pattern: 'lib/jquery/jquery.js', included: false},
+    {pattern: 'lib/requirejs/require.js', included: false},
+    {pattern: 'src/*.js', included: false},
+    {pattern: 'test/spec/*-spec.js', included: false},
 
-  	// helpers & fixtures for jasmine-jquery
+    // helpers & fixtures for jasmine-jquery
     { pattern: 'test/helpers/*.js', included: true },
-  	'test/test-main.js',
+    'test/test-main.js',
 ];
 
 
