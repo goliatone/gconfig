@@ -96,7 +96,7 @@ module.exports = function (grunt) {
                                 console.log('We are here ', markdown);
                                 html = require( 'markdown' ).markdown.toHTML( markdown );
 
-                                style = "<style>body {font-family: 'Helvetica Neue', 'Arial'; font-size: 16px; color: #333; } pre { background-color: #eee; padding: 0.5em; } hr { margin: 2em 0 }</style>";
+                                style = '<style>body {font-family: "Helvetica Neue", "Arial"; font-size: 16px; color: #333; } pre { background-color: #eee; padding: 0.5em; } hr { margin: 2em 0 }</style>';
 
                                 return style + html;
                             }

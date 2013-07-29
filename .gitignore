@@ -1,6 +1,6 @@
 temp
 .tmp
-dist
+lib
 .sass-cache
 node_modules
 app/components
