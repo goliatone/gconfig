@@ -1,6 +1,56 @@
-/*global define:true*/
-/* jshint strict: false */
-define('gconfig', ['jquery'], function($) {
+/*
+ * gmodule
+ * https://github.com/goliatone/gmodule
+ *
+ * Copyright (c) 2013 goliatone
+ * Licensed under the MIT license.
+ */
+/* jshint strict: false, plusplus: true */
+/*global define: false, require: false, module: false, exports: false */
+(function (root, name, deps, factory) {
+    "use strict";
+    // Node
+     if(typeof deps === 'function') { 
+        factory = deps;
+        deps = [];
+    }
+        
+    if (typeof exports === 'object') {        
+        module.exports = factory.apply(root, deps.map(require));
+    } else if (typeof define === 'function' && 'amd' in define) {
+        //require js
+        define(name, deps, factory);
+    } else {
+        // Browser
+        var d, i = 0, global = root, old = global[name], mod;
+        while((d = deps[i]) !== undefined) deps[i++] = root[d];
+        global[name] = mod = factory.apply(global, deps);
+        //Export no 'conflict module', aliases the module.
+        mod.noConflict = function(){
+            global[name] = old;
+            return mod;
+        };
+    }
+    //TODO: Get rid of jquery!
+}(this, "gconfig", ['jquery'], function($) {
+
+    //TODO: How do we get a reference to the global object here?
+    var _namespace = this; //module.config().namespace || this;
+    var _exportName = 'Module'; //module.config().exportName || 'Module';
+
+    var _splice = Array.prototype.splice;
+
+    var _isArray = function(obj){
+        return obj.toString() === '[object Array]';
+    };
+
+    var _merge = function(a, b){
+        for(var p in b){
+            if(b.hasOwnProperty(p))
+                a[p] = b[p];
+        }
+        return a;
+    };
 
     var options = {
         //http://stackoverflow.com/questions/7602410/how-do-i-find-elements-that-contain-a-data-attribute-matching-a-prefix-using-j
@@ -115,4 +165,4 @@ define('gconfig', ['jquery'], function($) {
 
     // exports['GConfig'] = GConfig;
     return GConfig;
-});
+}));
