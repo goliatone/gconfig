@@ -1,6 +1,6 @@
 /*
- * gmodule
- * https://github.com/goliatone/gmodule
+ * gconfig
+ * https://github.com/goliatone/gconfig
  *
  * Copyright (c) 2013 goliatone
  * Licensed under the MIT license.
