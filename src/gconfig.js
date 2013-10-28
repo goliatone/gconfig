@@ -34,22 +34,53 @@
     //TODO: Get rid of jquery!
 }(this, "gconfig", ['jquery'], function($) {
 
-    //TODO: How do we get a reference to the global object here?
-    var _namespace = this; //module.config().namespace || this;
-    var _exportName = 'Module'; //module.config().exportName || 'Module';
 
-    var _splice = Array.prototype.splice;
 
-    var _isArray = function(obj){
-        return obj.toString() === '[object Array]';
+    /**
+     * Extend method.
+     * @param  {Object} target Source object
+     * @return {Object}        Resulting object from
+     *                         meging target to params.
+     */
+    var _extend = function(target) {
+        var i = 1, length = arguments.length, source;
+        for ( ; i < length; i++ ) {
+            // Only deal with defined values
+            if ((source = arguments[i]) != undefined ){
+                Object.getOwnPropertyNames(source).forEach(function(k){
+                    var d = Object.getOwnPropertyDescriptor(source, k) || {value:source[k]};
+                    if (d.get) {
+                        target.__defineGetter__(k, d.get);
+                        if (d.set) target.__defineSetter__(k, d.set);
+                    } else if (target !== d.value) target[k] = d.value;                
+                });
+            }
+        }
+        return target;
     };
 
-    var _merge = function(a, b){
-        for(var p in b){
-            if(b.hasOwnProperty(p))
-                a[p] = b[p];
+    /**
+     * Proxy method
+     * @param  {Function} fn      Function to be proxied
+     * @param  {Object}   context Context for the method.
+     */
+    var _proxy = function( fn, context ) {
+        var tmp, args, proxy;
+
+        if ( typeof context === "string" ) {
+            tmp = fn[ context ];
+            context = fn;
+            fn = tmp;
         }
-        return a;
+
+        if ( ! typeof(fn) === 'function') return undefined;
+
+        args = slice.call(arguments, 2);
+        proxy = function() {
+            return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
+        };
+
+        return proxy;
     };
 
     var options = {
