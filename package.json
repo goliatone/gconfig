@@ -1,7 +1,7 @@
 {
 	"name": "gconfig",
 	"description": "Configuration utility.",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"homepage": "https://github.com/goliatone/node",
 	"repository": {
 		"type": "git",
