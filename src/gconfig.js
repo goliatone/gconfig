@@ -18,8 +18,9 @@
     if (typeof exports === 'object') {        
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
-        //require js
-        define(name, deps, factory);
+        //require js, here we assume the file is named as the lower
+        //case module name.
+        define(name.toLowerCase(), deps, factory);
     } else {
         // Browser
         var d, i = 0, global = root, old = global[name], mod;
@@ -32,7 +33,7 @@
         };
     }
     //TODO: Get rid of jquery!
-}(this, "gconfig", ['jquery'], function($) {
+}(this, "GConfig", function() {
 
 
 
@@ -65,7 +66,7 @@
      * @param  {Object}   context Context for the method.
      */
     var _proxy = function( fn, context ) {
-        var tmp, args, proxy;
+        var tmp, args, proxy, slice = Array.prototype.slice;
 
         if ( typeof context === "string" ) {
             tmp = fn[ context ];
@@ -99,14 +100,14 @@
      * @param  {object} config Configuration object.
      */
     var GConfig = function(config){
-        $.extend(options, config || {});
+        _extend(options, config || {});
 
         this.meta = {};
         this.namespaces = [];
         this.options = options;
         this.namespace = options.namespace;
 
-        var addMetaCallback = $.proxy(this.addMeta, this);
+        var addMetaCallback = _proxy(this.addMeta, this);
         _generateMeta(addMetaCallback);
         console.log('META: ', this.meta);
     };
@@ -136,7 +137,7 @@
             // console.log('meta name: %s :: %s ', key, meta[i].content);
 
             //no key?
-            if( !key ) continue;
+            if(!key) continue;
 
             //we have a regular meta, skip
             if( key.indexOf(':') === -1 ) return;
@@ -151,48 +152,32 @@
 
     };
 
-    GConfig.prototype.init = function(){
-        //we dont really need init right now
-        /*
-        // namespace = namespace || (namespace = options.namespace);
-        namespace = namespace || options.namespace;
-
-        return;
-        var selector = options.selector.replace('::NAMESPACE::', namespace);
-        var self = this;
-        // console.log('Selector is %s', selector);
-        $(selector).each(function(index, el){
-            self.addMeta(el.name.replace( namespace +'-',''), el.content, namespace);
-            // self.config[ element.name.replace('app-','') ] = element.content;
-        });*/
-    };
+    GConfig.prototype.init = function(){};
 
     GConfig.prototype.configure = function(object, namespace){
-        return $.extend(object, this.getNamespace(namespace));
+        return _extend(object, this.getNamespace(namespace));
     };
 
     GConfig.prototype.addMeta = function(key, value, namespace){
         console.log('Adding: %s::%s under %s.', key, value, namespace);
-
-        namespace = namespace || this.namespace;
+        namespace || (namespace = this.namespace);
         if(!(namespace in this.meta)) this.meta[namespace] = {};
         this.meta[namespace][key] = value;
         return this;
     };
 
     GConfig.prototype.getMeta = function(key, defaultValue, namespace){
-        namespace = namespace || this.namespace;
+        namespace || (namespace = this.namespace);
         if(!(namespace in this.meta) || !(key in this.meta[namespace]))
             return defaultValue;
         return this.meta[namespace][key];
     };
 
     GConfig.prototype.getNamespace = function(namespace){
-        namespace = namespace || this.namespace;
+        namespace || (namespace = this.namespace);
         if(!(namespace in this.meta)) return {};
         return this.meta[namespace];
     };
-
 
     // exports['GConfig'] = GConfig;
     return GConfig;
