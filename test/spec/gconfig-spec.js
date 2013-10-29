@@ -31,18 +31,21 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
         it('should get all meta keys', function(){
             var config = new GConfig();
             Object.keys(meta).map(function(key){
+                expect(meta[key]).toEqual(config.get(key));
                 expect(meta[key]).toEqual(config.getMeta(key));
             });
         });
 
         it('if no key matches should return default parameter', function(){
             var config = new GConfig();
+            expect(config.get('nothing','defaultValue')).toEqual('defaultValue');
             expect(config.getMeta('nothing','defaultValue')).toEqual('defaultValue');
         });
 
         it('addMeta should update config', function(){
             var config = new GConfig();
             config.addMeta('added','addedMeta');
+            expect(config.get('added')).toEqual('addedMeta');
             expect(config.getMeta('added')).toEqual('addedMeta');
         });
 
@@ -53,11 +56,13 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
 
         it('should namespace correctly.', function() {
             var config = new GConfig();
+            expect(config.get('id',null, 'widget')).toEqual('widgetId');
             expect(config.getMeta('id',null, 'widget')).toEqual('widgetId');
         });
 
         it('if no key matches for the given namespace should return default parameter', function() {
             var config = new GConfig();
+            expect(config.get('nothing','defaultValue', 'widget')).toEqual('defaultValue');
             expect(config.getMeta('nothing','defaultValue', 'widget')).toEqual('defaultValue');
         });
 
