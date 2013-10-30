@@ -121,11 +121,9 @@
 ///////////////////////////////////////////////////
 
     /**
-     * Parse metadata
-     * @param  {[type]} attribute [description]
-     * @return {[type]}           [description]
+     * Method to update the meta object, from the meta NodeList
      */
-    GConfig.prototype.generateMeta = function( addMetaCallback )
+    GConfig.prototype.generateMeta = function( )
     {
         var key = null, val = null, nsp = null;
 
