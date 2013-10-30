@@ -109,6 +109,15 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             for(var key in cplus) expect(config.get(key)).toEqual(cplus[key]);
         });
 
+        it('should merge object to namespaced config', function(){
+            var config = new GConfig();
+            var cplus  = {a:1,b:'c'};
+            var namespace = 'widget';
+            config.merge(cplus, namespace);
+            for(var key in cplus) 
+                expect(config.get(key, 'default', namespace)).toEqual(cplus[key]);
+        });
+
     });
 
 });
