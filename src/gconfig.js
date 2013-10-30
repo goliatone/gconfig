@@ -158,8 +158,11 @@
         return _extend(object, this.getNamespace(namespace));
     };
 
+    GConfig.prototype.merge = function(object, namespace){
+        return _extend(this.getNamespace(namespace), object);
+    };
 
-    GConfig.prototype.add = function(key, value, namespace){
+    GConfig.prototype.set = function(key, value, namespace){
         console.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.meta)) this.meta[namespace] = {};
@@ -175,14 +178,16 @@
     };
 
     //This will eventually be deprecated!
-    GConfig.prototype.addMeta = GConfig.prototype.add;
+    GConfig.prototype.addMeta = GConfig.prototype.set;
     GConfig.prototype.getMeta = GConfig.prototype.get;
 
-    GConfig.prototype.getNamespace = function(namespace){
+    GConfig.prototype.getNamespace = function(namespace, notCloned){
         namespace || (namespace = this.namespace);
         if(!(namespace in this.meta)) return {};
-        return this.meta[namespace];
+        if(notCloned) return this.meta[namespace];
+        else return _extend({}, this.meta[namespace]);
     };
+
 
     // exports['GConfig'] = GConfig;
     return GConfig;
