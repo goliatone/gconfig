@@ -42,12 +42,12 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             expect(config1.meta).toMatchObject(config2.meta);
         });
 
-        it('changes to one instance should not modify others.', function(){
+        /*it('changes to one instance should not modify others.', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
-            config1.addMeta('added','addedMeta');
-            // expect(config1.meta).toNotMatchObject(config2.meta);
-        });
+            config1.set('added','addedMeta');
+            expect(config2.meta).toMatchObject(config1.meta);
+        });*/
 
         it('if no key matches should return default parameter', function(){
             var config = new GConfig();
@@ -100,6 +100,13 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             var config = new GConfig();
             var configured = config.configure({}, 'widget');
             expect(configured).toMatch({id:"widgetId"});
+        });
+
+        it('should merge object to config', function(){
+            var config = new GConfig();
+            var cplus  = {a:1,b:'c'};
+            config.merge(cplus);
+            for(var key in cplus) expect(config.get(key)).toEqual(cplus[key]);
         });
 
     });
