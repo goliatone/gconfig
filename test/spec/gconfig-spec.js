@@ -39,14 +39,14 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
         it('it should return the same content for different instances', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
-            expect(config1.meta).toMatchObject(config2.meta);
+            expect(config1.data).toMatchObject(config2.data);
         });
 
         /*it('changes to one instance should not modify others.', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
             config1.set('added','addedMeta');
-            expect(config2.meta).toMatchObject(config1.meta);
+            expect(config2.data).toMatchObject(config1.data);
         });*/
 
         it('if no key matches should return default parameter', function(){
