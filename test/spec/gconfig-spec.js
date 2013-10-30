@@ -42,6 +42,10 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             expect(config1.data).toMatchObject(config2.data);
         });
 
+        it('generateMeta should parse DOM correctly', function(){
+            
+        });
+
         /*it('changes to one instance should not modify others.', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
