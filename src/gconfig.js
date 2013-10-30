@@ -153,6 +153,11 @@
     };
 
     GConfig.prototype.init = function(){};
+    
+    GConfig.prototype.use = function(ext){
+        _extend(GConfig.prototype, ext);
+        return this;
+    };
 
     GConfig.prototype.configure = function(object, namespace){
         return _extend(object, this.getNamespace(namespace));
@@ -178,10 +183,6 @@
         return this.meta[namespace][key];
     };
 
-    //This will eventually be deprecated!
-    GConfig.prototype.addMeta = GConfig.prototype.set;
-    GConfig.prototype.getMeta = GConfig.prototype.get;
-
     GConfig.prototype.getNamespace = function(namespace, notCloned){
         namespace || (namespace = this.namespace);
         if(!(namespace in this.meta)) return {};
@@ -191,7 +192,9 @@
         else return _extend({}, this.meta[namespace]);
     };
 
-
-    // exports['GConfig'] = GConfig;
+    //This will eventually be deprecated!
+    GConfig.prototype.addMeta = GConfig.prototype.set;
+    GConfig.prototype.getMeta = GConfig.prototype.get;
+    
     return GConfig;
 }));
