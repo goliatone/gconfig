@@ -36,6 +36,19 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             });
         });
 
+        it('it should return the same content for different instances', function(){
+            var config1 = new GConfig();
+            var config2 = new GConfig();
+            expect(config1.meta).toMatchObject(config2.meta);
+        });
+
+        it('changes to one instance should not modify others.', function(){
+            var config1 = new GConfig();
+            var config2 = new GConfig();
+            config1.addMeta('added','addedMeta');
+            // expect(config1.meta).toNotMatchObject(config2.meta);
+        });
+
         it('if no key matches should return default parameter', function(){
             var config = new GConfig();
             expect(config.get('nothing','defaultValue')).toEqual('defaultValue');
@@ -56,8 +69,8 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
 
         it('should namespace correctly.', function() {
             var config = new GConfig();
-            expect(config.get('id',null, 'widget')).toEqual('widgetId');
-            expect(config.getMeta('id',null, 'widget')).toEqual('widgetId');
+            expect(config.get('id', null, 'widget')).toEqual('widgetId');
+            expect(config.getMeta('id', null, 'widget')).toEqual('widgetId');
         });
 
         it('if no key matches for the given namespace should return default parameter', function() {
@@ -75,6 +88,18 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             var config = new GConfig();
             var configured = config.configure({});
             expect(configured).toMatch(meta);
+        });
+
+        it('should configure passed in objects.', function() {
+            var config = new GConfig();
+            var configured = config.configure({});
+            expect(configured).toMatch(meta);
+        });
+
+        it('should configure passed in objects by namespace.', function() {
+            var config = new GConfig();
+            var configured = config.configure({}, 'widget');
+            expect(configured).toMatch({id:"widgetId"});
         });
 
     });
