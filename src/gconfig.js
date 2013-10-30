@@ -102,14 +102,18 @@
     var GConfig = function(config){
         _extend(options, config || {});
 
-        this.meta = {};
+        this.data = {};
+        this.meta = document.getElementsByTagName('meta');       
+        
         this.namespaces = [];
         this.options = options;
         this.namespace = options.namespace;
 
-        var addMetaCallback = _proxy(this.addMeta, this);
-        _generateMeta(addMetaCallback);
-        console.log('META: ', this.meta);
+        // var addMetaCallback = _proxy(this.set, this);
+        this.generateMeta();
+        console.log('META: ', this.data);
+
+        this.init();
     };
 
 ///////////////////////////////////////////////////
@@ -121,14 +125,11 @@
      * @param  {[type]} attribute [description]
      * @return {[type]}           [description]
      */
-    var _generateMeta = function( addMetaCallback )
+    GConfig.prototype.generateMeta = function( addMetaCallback )
     {
         var key = null, val = null, nsp = null;
 
-        var meta = this.meta || (this.meta = document.getElementsByTagName('meta'));
-        console.log('--------');
-        console.log(meta);
-        console.log('total, ', meta.length);
+        var meta = this.meta// || (this.meta = document.getElementsByTagName('meta'));
 
         // search desired tag
         for( var i = 0, l = meta.length; i < l; i++ )
@@ -147,13 +148,14 @@
             val = meta[i].content;
 
             //trigger callback
-            addMetaCallback(key, val, nsp);
+            // addMetaCallback(key, val, nsp);
+            this.set(key, val, nsp);
         }
 
     };
 
     GConfig.prototype.init = function(){};
-    
+
     GConfig.prototype.use = function(ext){
         _extend(GConfig.prototype, ext);
         return this;
@@ -171,25 +173,25 @@
     GConfig.prototype.set = function(key, value, namespace){
         console.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.meta)) this.meta[namespace] = {};
-        this.meta[namespace][key] = value;
+        if(!(namespace in this.data)) this.data[namespace] = {};
+        this.data[namespace][key] = value;
         return this;
     };
 
     GConfig.prototype.get = function(key, defaultValue, namespace){
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.meta) || !(key in this.meta[namespace]))
+        if(!(namespace in this.data) || !(key in this.data[namespace]))
             return defaultValue;
-        return this.meta[namespace][key];
+        return this.data[namespace][key];
     };
 
     GConfig.prototype.getNamespace = function(namespace, notCloned){
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.meta)) return {};
-        return this.meta[namespace];
+        if(!(namespace in this.data)) return {};
+        return this.data[namespace];
 
-        if(notCloned) return this.meta[namespace];
-        else return _extend({}, this.meta[namespace]);
+        if(notCloned) return this.data[namespace];
+        else return _extend({}, this.data[namespace]);
     };
 
     //This will eventually be deprecated!
