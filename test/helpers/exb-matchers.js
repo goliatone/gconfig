@@ -176,7 +176,7 @@ function _endsWith(haystack, needle){
 
 function _deepEqual(a,b){
     if (typeof a != "object" ||
-     typeof b != "object") return a === b;
+        typeof b != "object") return a === b;
 
     if (a === b) return true;
 
