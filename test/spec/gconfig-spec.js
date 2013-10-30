@@ -118,6 +118,14 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
                 expect(config.get(key, 'default', namespace)).toEqual(cplus[key]);
         });
 
+        it('can be extended by plugins with thte use method', function(){
+            var expected = 'something';
+            var plugin = {ext:function(){return expected;}};
+            var config = new GConfig().use(plugin);
+            expect(config).toHaveMethods('ext');
+            expect(config.ext()).toEqual(expected);
+        });
+
     });
 
 });
