@@ -159,7 +159,8 @@
     };
 
     GConfig.prototype.merge = function(object, namespace){
-        return _extend(this.getNamespace(namespace), object);
+        _extend(this.getNamespace(namespace), object);
+        return this;
     };
 
     GConfig.prototype.set = function(key, value, namespace){
@@ -184,6 +185,8 @@
     GConfig.prototype.getNamespace = function(namespace, notCloned){
         namespace || (namespace = this.namespace);
         if(!(namespace in this.meta)) return {};
+        return this.meta[namespace];
+
         if(notCloned) return this.meta[namespace];
         else return _extend({}, this.meta[namespace]);
     };
