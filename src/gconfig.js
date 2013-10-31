@@ -139,7 +139,7 @@
             if(!key) continue;
 
             //we have a regular meta, skip
-            if( key.indexOf(':') === -1 ) return;
+            if( key.indexOf(':') === -1 ) continue;
 
             nsp = key.split(':')[0];
             key = key.split(':')[1];
