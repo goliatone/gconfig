@@ -18,6 +18,9 @@ for (var i = 0; i < metaTags.length; i++) {
 }
 ```
 
-- [ ] Review install process. Export only gconfig, no cruft.
+- [x] Review install process. Export only gconfig, no cruft.
 - [ ] Do we need component.json or bower.json is enough?
+- [ ] Plugins: persistence? db manager? 
+
+Refactor data to use a data provider, so we can use different _drivers_ ie: DOM (meta), JSON service, local storage...
 
