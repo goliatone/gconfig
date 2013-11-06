@@ -107,11 +107,9 @@
         
         this.namespaces = [];
         this.options = options;
-        this.namespace = options.namespace;
+        this.namespace = options.namespace;       
 
-        // var addMetaCallback = _proxy(this.set, this);
-        this.generateMeta();
-        console.log('META: ', this.data);
+        this.initialized = false;
 
         this.init();
     };
@@ -121,9 +119,11 @@
 ///////////////////////////////////////////////////
 
     /**
+     * TODO: Rename, we want this to be a generic method, generateConfig.
+     * TODO: Return promise or emit on done.
      * Method to update the meta object, from the meta NodeList
      */
-    GConfig.prototype.generateMeta = function( )
+    GConfig.prototype.getConfig = function( )
     {
         var key = null, val = null, nsp = null;
 
@@ -150,9 +150,24 @@
             this.set(key, val, nsp);
         }
 
+        /*
+            Nofity we are ready to go, but make sure we
+            notify on next frame that way we can do:
+            var c = new GConfig();
+            c.on('ondata', this.onConfig);
+         */
+        setTimeout((function(){
+            this.emit('ondata');
+        }).bind(this), 0);
     };
 
-    GConfig.prototype.init = function(){};
+    GConfig.prototype.init = function(){
+        if(this.initialized) return;
+        this.initialized = true;
+        // var addMetaCallback = _proxy(this.set, this);
+        this.getConfig( );
+        console.log('META: ', this.data);
+    };
 
     GConfig.prototype.use = function(ext){
         _extend(GConfig.prototype, ext);
@@ -169,6 +184,7 @@
     };
 
     GConfig.prototype.set = function(key, value, namespace){
+        //TODO: Make bindable.
         console.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
