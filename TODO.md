@@ -24,3 +24,25 @@ for (var i = 0; i < metaTags.length; i++) {
 
 Refactor data to use a data provider, so we can use different _drivers_ ie: DOM (meta), JSON service, local storage...
 
+## Make POJOs of self.
+It would be interesting to attach all properties to the resulting config object so that:
+
+```html
+<meta name="app:name" content="GConfig Tester">
+<meta name="app:baseurl" content="http://localhost:9030">
+<meta name="app:default-controller" content="Controller">
+<meta name="sidebar:controller" content="SidebarController">
+<meta name="widget:id" content="widgetId">
+```
+Could be accessed like:
+
+```javascript
+var config = new GConfig();
+console.log(config.app.name) //GConfig Tester
+console.log(config.app.baseurl) //http://localhost:9030
+console.log(config.app['default-controller']) //Controller
+console.log(config.sidebar.controller) //SidebarController
+console.log(config.widget.id) //widgetId
+```
+
+Should default namespace be merged into the `config` object?!
