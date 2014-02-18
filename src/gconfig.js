@@ -53,7 +53,7 @@
                     if (d.get) {
                         target.__defineGetter__(k, d.get);
                         if (d.set) target.__defineSetter__(k, d.set);
-                    } else if (target !== d.value) target[k] = d.value;                
+                    } else if (target !== d.value) target[k] = d.value;
                 });
             }
         }
@@ -68,7 +68,7 @@
     var _proxy = function( fn, context ) {
         var tmp, args, proxy, slice = Array.prototype.slice;
 
-        if ( typeof context === "string" ) {
+        if ( typeof context === 'string') {
             tmp = fn[ context ];
             context = fn;
             fn = tmp;
@@ -103,11 +103,11 @@
         _extend(options, config || {});
 
         this.data = {};
-        this.meta = document.getElementsByTagName('meta');       
+        this.meta = document.getElementsByTagName('meta');
         
         this.namespaces = [];
         this.options = options;
-        this.namespace = options.namespace;       
+        this.namespace = options.namespace;
 
         this.initialized = false;
 
@@ -127,13 +127,13 @@
     {
         var key = null, val = null, nsp = null;
 
-        var meta = this.meta// || (this.meta = document.getElementsByTagName('meta'));
+        var meta = this.meta || (this.meta = document.getElementsByTagName('meta'));
 
         // search desired tag
         for( var i = 0, l = meta.length; i < l; i++ )
         {
             key = meta[i].name || meta[i].getAttribute('property');
-            // console.log('meta name: %s :: %s ', key, meta[i].content);
+            // this.log.log('meta name: %s :: %s ', key, meta[i].content);
 
             //no key?
             if(!key) continue;
@@ -166,7 +166,7 @@
         this.initialized = true;
         // var addMetaCallback = _proxy(this.set, this);
         this.getConfig( );
-        console.log('META: ', this.data);
+        this.log.log('META: ', this.data);
     };
 
     GConfig.prototype.use = function(ext){
@@ -185,7 +185,7 @@
 
     GConfig.prototype.set = function(key, value, namespace){
         //TODO: Make bindable.
-        console.log('Adding: %s::%s under %s.', key, value, namespace);
+        this.log.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
@@ -206,6 +206,11 @@
 
         if(notCloned) return this.data[namespace];
         else return _extend({}, this.data[namespace]);
+    };
+
+    GConfig.prototype.log = function(){
+        if(!this.debug) return;
+        console.log.apply(console, arguments);
     };
 
     //This will eventually be deprecated!
