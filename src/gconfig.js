@@ -134,7 +134,7 @@
         for( var i = 0, l = meta.length; i < l; i++ )
         {
             key = meta[i].name || meta[i].getAttribute('property');
-            // this.log.log('meta name: %s :: %s ', key, meta[i].content);
+            // this.log('meta name: %s :: %s ', key, meta[i].content);
 
             //no key?
             if(!key) continue;
@@ -157,9 +157,13 @@
             var c = new GConfig();
             c.on('ondata', this.onConfig);
          */
-        setTimeout((function(){
+        this.onConfigLoaded();
+    };
+
+    GConfig.prototype.onConfigLoaded = function(){
+        /*setTimeout((function(){
             this.emit('ondata');
-        }).bind(this), 0);
+        }).bind(this), 0);*/
     };
 
     GConfig.prototype.init = function(){
@@ -167,7 +171,7 @@
         this.initialized = true;
         // var addMetaCallback = _proxy(this.set, this);
         this.getConfig( );
-        this.log.log('META: ', this.data);
+        this.log('META: ', this.data);
     };
 
     /**
@@ -224,7 +228,7 @@
      */
     GConfig.prototype.set = function(key, value, namespace){
         //TODO: Make bindable.
-        this.log.log('Adding: %s::%s under %s.', key, value, namespace);
+        this.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
