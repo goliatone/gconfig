@@ -1,3 +1,4 @@
+"use strict";
 /*
  * gconfig
  * https://github.com/goliatone/gconfig
@@ -8,14 +9,14 @@
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
 (function (root, name, deps, factory) {
-    "use strict";
+    
     // Node
-     if(typeof deps === 'function') { 
+    if(typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
         
-    if (typeof exports === 'object') {        
+    if (typeof exports === 'object') {
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
         //require js, here we assume the file is named as the lower
@@ -33,7 +34,7 @@
         };
     }
     //TODO: Get rid of jquery!
-}(this, "GConfig", function() {
+}(this, 'GConfig', function() {
 
 
 
@@ -169,20 +170,58 @@
         this.log.log('META: ', this.data);
     };
 
+    /**
+     * Extends GConfig's prototype. Use it to add
+     * functionality or to override methods. The
+     * idea is to support a plugin architecture.
+     * @param  {Object} ext Object which's properties and
+     *                      methods will get merged into 
+     *                      GConfig's prototype
+     * @return {GConfig}    Fluid interface.
+     */
     GConfig.prototype.use = function(ext){
         _extend(GConfig.prototype, ext);
         return this;
     };
 
+    /**
+     * It will extend the provided object with the
+     * matching configuration object under the given
+     * namespace.
+     * If no namespace is provided, the default one
+     * will be used.
+     * TODO: Do we want to return GConfig or provided
+     * source object? Which should be the chain's subject?
+     * 
+     * @param  {Object} object    Object to be config.
+     * @param  {String} namespace Namespace id
+     * @return {GConfig}          Fluid interface.
+     */
     GConfig.prototype.configure = function(object, namespace){
-        return _extend(object, this.getNamespace(namespace));
+        _extend(object, this.getNamespace(namespace));
+        return this;
     };
 
+    /**
+     * Extend the identified namespace with the 
+     * given object.
+     *     
+     * @param  {Object} object    Object to be merged.
+     * @param  {String} namespace Namespace id.
+     * @return {GConfig}          Fluid interface.
+     */
     GConfig.prototype.merge = function(object, namespace){
         _extend(this.getNamespace(namespace), object);
         return this;
     };
 
+    /**
+     * Set a key value under the given namespace
+     * @param {String} key       Property value
+     * @param {Object} value     Value to be added
+     * @param  {String} namespace Namespace id
+     * @return {GConfig}          Fluid interface.
+     */
     GConfig.prototype.set = function(key, value, namespace){
         //TODO: Make bindable.
         this.log.log('Adding: %s::%s under %s.', key, value, namespace);
@@ -192,6 +231,14 @@
         return this;
     };
 
+    /**
+     * Get a value by key, we can provide a default
+     * value in case the key is not registered.
+     * @param  {String} key          Key 
+     * @param  {Object} defaultValue Default value
+     * @param  {String} namespace Namespace id
+     * @return {Object}           Key value
+     */
     GConfig.prototype.get = function(key, defaultValue, namespace){
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data) || !(key in this.data[namespace]))
@@ -199,15 +246,31 @@
         return this.data[namespace][key];
     };
 
+    /**
+     * Returns a clone of the configuration object
+     * identified by `namespace` id.
+     * If no namespace id is provided, default is used.
+     * We can also pass a second argument to indicate
+     * if we want to get a clone of the namespace object
+     * or the actual reference.
+     * 
+     * @param  {String} namespace Namespace id
+     * @param  {Boolean} notCloned Should we clone namespace
+     * @return {Object}           Namespace object.
+     */
     GConfig.prototype.getNamespace = function(namespace, notCloned){
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) return {};
         return this.data[namespace];
 
         if(notCloned) return this.data[namespace];
-        else return _extend({}, this.data[namespace]);
+
+        return _extend({}, this.data[namespace]);
     };
 
+    /**
+     * Simple log implementation.
+     */
     GConfig.prototype.log = function(){
         if(!this.debug) return;
         console.log.apply(console, arguments);
