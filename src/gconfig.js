@@ -110,6 +110,10 @@
         this.options = options;
         this.namespace = options.namespace;
 
+        //TODO: Should we do methods instead of strings?
+        this.loaders = ['loadMedatada'];
+        this.loadMedatada.async = false;
+
         this.initialized = false;
 
         this.init();
@@ -118,13 +122,28 @@
 ///////////////////////////////////////////////////
 // PRIVATE METHODS
 ///////////////////////////////////////////////////
+    
+    /**
+     * Method that triggers data loaders.
+     * By default, we use `loadMetadata` a 
+     * synchronous loader.
+     * @return {GConfig}    Fluid interface.
+     */
+    GConfig.prototype.getConfig = function( )
+    {
+        //TODO: We should provide a next to each loader
+        //to step forward on the chain.
+        this.loaders.forEach(function(loader){
+            this[loader].call(this);
+        }, this);
+        this.onConfigLoaded();
+    };
 
     /**
-     * TODO: Rename, we want this to be a generic method, generateConfig.
      * TODO: Return promise or emit on done.
      * Method to update the meta object, from the meta NodeList
      */
-    GConfig.prototype.getConfig = function( )
+    GConfig.prototype.loadMedatada = function( )
     {
         var key = null, val = null, nsp = null;
 
@@ -150,14 +169,6 @@
             // addMetaCallback(key, val, nsp);
             this.set(key, val, nsp);
         }
-
-        /*
-            Nofity we are ready to go, but make sure we
-            notify on next frame that way we can do:
-            var c = new GConfig();
-            c.on('ondata', this.onConfig);
-         */
-        this.onConfigLoaded();
     };
 
     GConfig.prototype.onConfigLoaded = function(){
