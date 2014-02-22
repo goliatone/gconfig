@@ -1,6 +1,7 @@
 ##TODO:
 - [ ] Add lib/* to .gitignore
 - [ ] Ensure we bower install on `before_script: bower install`
+- [ ] Make loaders handle async methods.
 
 Should we get rid of jQuery?
 We use `$.proxy` and `$.extend`
@@ -46,3 +47,8 @@ console.log(config.widget.id) //widgetId
 ```
 
 Should default namespace be merged into the `config` object?!
+
+
+Async forEach:
+http://stackoverflow.com/questions/17860089/array-and-asynchronous-function-callback
+http://zef.me/3420/async-foreach-in-javascript

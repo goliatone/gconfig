@@ -50,6 +50,18 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             
         });
 
+        it('should have a default namespace',function(){
+            var config = new GConfig();
+            //TODO: We should not have to fuck with namespace this way, make configurable
+            expect(config.options.namespace).toMatch('app');
+        });
+
+        it('should set a key value in default namespace',function(){
+            var config = new GConfig();
+            config.set('key', 'value');
+            expect(config.data[config.options.namespace].key).toMatch('value');
+        });
+
         /*it('changes to one instance should not modify others.', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
@@ -89,6 +101,7 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
 
         it('if the given namespace does not exists should return default parameter', function() {
             var config = new GConfig();
+            expect(config.get('nothing','defaultValue', 'nothing')).toEqual('defaultValue');
             expect(config.getMeta('nothing','defaultValue', 'nothing')).toEqual('defaultValue');
         });
 
@@ -126,7 +139,7 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
                 expect(config.get(key, 'default', namespace)).toEqual(cplus[key]);
         });
 
-        it('can be extended by plugins with thte use method', function(){
+        it('can be extended by plugins with the use method', function(){
             var expected = 'something';
             var plugin = {ext:function(){return expected;}};
             var config = new GConfig().use(plugin);
@@ -134,6 +147,15 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             expect(config.ext()).toEqual(expected);
         });
 
+        it('api addMeta and set should be same method', function(){
+            var config = new GConfig();
+            expect(config.addMeta).toMatchObject(config.set);
+        });
+
+        it('api getMeta and get should be same method', function(){
+            var config = new GConfig();
+            expect(config.getMeta).toMatchObject(config.get);
+        });
     });
 
 });
