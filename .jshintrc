@@ -25,6 +25,7 @@
   "boss": true,
   "eqnull": true,
   "forin":false,
+  "plusplus":false,
   "globals": {
     "angular": false,
     "jquery":true,
