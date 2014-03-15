@@ -33,7 +33,6 @@
             return mod;
         };
     }
-    //TODO: Get rid of jquery!
 }(this, 'GConfig', function() {
 
 
