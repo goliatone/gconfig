@@ -2,8 +2,8 @@
 /* jshint strict: false */
 requirejs.config({
     paths: {
-        'jquery': '../lib/jquery/jquery',
-        'gconfig': '../src/gconfig'
+        'jquery': 'jquery/jquery',
+        'gconfig': 'gconfig'
     }
 });
 
@@ -37,7 +37,7 @@ define(['gconfig', 'jquery'], function (GConfig, $) {
 	config.log(config.get('baseurl'));
 	config.log(config.get('default-controller'));
 
-	var widget  = {'template':'widget-template'}; 
+	var widget  = {'template':'widget-template'};
 	var service = {'serviceUrl':'http://api.example.com/v1/'};
 	console.log('-----');
 	config.log('cf ', config.data);
