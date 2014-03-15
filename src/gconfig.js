@@ -186,6 +186,9 @@
     };
 
     /**
+     * TODO: Review plugin procedure. We want to pass 
+     *       GConfig to plugin to extend and initialize.
+     * 
      * Extends GConfig's prototype. Use it to add
      * functionality or to override methods. The
      * idea is to support a plugin architecture.
