@@ -25,7 +25,7 @@ define(['gconfig', 'jquery'], function (GConfig, $) {
         var self = this;
         head.appendChild = function(){
             self.generateMeta();
-            __appendChild.apply(head, arguments); 
+            __appendChild.apply(head, arguments);
         };
 	}});
 	config.watch();
