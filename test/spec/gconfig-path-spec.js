@@ -4,6 +4,8 @@
 /*global expect:true */
 /*global beforeEach:true */
 /* jshint strict: false */
+
+
 define(['gconfig','gconfig.path',  'jquery'], function(GConfig, GCPPath, $) {
     var html = [
         '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
@@ -25,6 +27,23 @@ define(['gconfig','gconfig.path',  'jquery'], function(GConfig, GCPPath, $) {
         beforeEach(function(){
             GCPPath.register(GConfig);
             $('head').append(html);
+        });
+
+        it('GConfig should have one extra method added by path plugin',function(){
+            var config = new GConfig();
+            expect(config).toHaveMethods(['resolve']);
+        });
+
+        it('GConfig should resolve dot notation paths', function(){
+            var config = new GConfig();
+            expect(config.resolve('app.name')).toMatch(config.get('name'));
+        });
+
+        it('GConfig should set dot notation paths', function(){
+            var config = new GConfig();
+            config.set('app.test.value', 'NewValue');
+            expect(config.data.app.test.value).toMatch('NewValue');
+            expect(config.resolve('app.test.value')).toMatch('NewValue');
         });
 
         it('GConfig shold be loaded', function() {
@@ -146,11 +165,6 @@ define(['gconfig','gconfig.path',  'jquery'], function(GConfig, GCPPath, $) {
             var config = new GConfig().use(plugin);
             expect(config).toHaveMethods('ext');
             expect(config.ext()).toEqual(expected);
-        });
-
-        it('api addMeta and set should be same method', function(){
-            var config = new GConfig();
-            expect(config.addMeta).toMatchObject(config.set);
         });
 
         it('api getMeta and get should be same method', function(){
