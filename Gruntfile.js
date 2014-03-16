@@ -106,9 +106,9 @@ module.exports = function (grunt) {
             unit: {
                 reporters: 'dots'
             },
-            continuous: {
-                singleRun: true,
-                browsers: ['PhantomJS']
+            browser:{
+                singleRun:false,
+                browsers:['Chrome']
             },
             ci: {
                 singleRun: true,
