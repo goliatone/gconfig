@@ -4,7 +4,7 @@
 /*global expect:true */
 /*global beforeEach:true */
 /* jshint strict: false */
-define(['gconfig', 'jquery'], function(GConfig, $) {
+define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
     var html = [
         '<meta http-equiv="X-UA-Compatible" content="IE=edge">',
         '<meta name="description" content="">',
@@ -47,7 +47,7 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
         });
 
         it('generateMeta should parse DOM correctly', function(){
-            
+
         });
 
         it('should have a default namespace',function(){
@@ -135,7 +135,7 @@ define(['gconfig', 'jquery'], function(GConfig, $) {
             var cplus  = {a:1,b:'c'};
             var namespace = 'widget';
             config.merge(cplus, namespace);
-            for(var key in cplus) 
+            for(var key in cplus)
                 expect(config.get(key, 'default', namespace)).toEqual(cplus[key]);
         });
 
