@@ -34,7 +34,7 @@
         };
     }
     //TODO: Get rid of jquery!
-}(this, 'GCPPath', function() {
+}(this, 'gconfig.path', function() {
 
 
     /**
