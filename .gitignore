@@ -1,7 +1,7 @@
 temp
 .tmp
 lib
-coverage/*
+.coverage/*
 .sass-cache
 node_modules
 app/components

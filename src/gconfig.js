@@ -9,13 +9,13 @@
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
 (function (root, name, deps, factory) {
-    
+
     // Node
     if(typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
-        
+
     if (typeof exports === 'object') {
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
@@ -33,7 +33,6 @@
             return mod;
         };
     }
-    //TODO: Get rid of jquery!
 }(this, 'GConfig', function() {
 
 
@@ -97,7 +96,7 @@
 
     /**
      * GConfig constructor
-     * 
+     *
      * @param  {object} config Configuration object.
      */
     var GConfig = function(config){
@@ -105,7 +104,7 @@
 
         this.data = {};
         this.meta = document.getElementsByTagName('meta');
-        
+
         this.namespaces = [];
         this.options = options;
         this.namespace = options.namespace;
@@ -122,10 +121,10 @@
 ///////////////////////////////////////////////////
 // PRIVATE METHODS
 ///////////////////////////////////////////////////
-    
+
     /**
      * Method that triggers data loaders.
-     * By default, we use `loadMetadata` a 
+     * By default, we use `loadMetadata` a
      * synchronous loader.
      * @return {GConfig}    Fluid interface.
      */
@@ -193,12 +192,18 @@
      * functionality or to override methods. The
      * idea is to support a plugin architecture.
      * @param  {Object} ext Object which's properties and
-     *                      methods will get merged into 
+     *                      methods will get merged into
      *                      GConfig's prototype
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext){
-        _extend(GConfig.prototype, ext);
+
+
+        if(typeof ext === 'function') ext(GConfig);
+        else if('register' in ext &&
+            typeof ext.register === 'function') ext.register(GConfig);
+        else if(typeof ext === 'object') _extend(GConfig.prototype, ext);
+
         return this;
     };
 
@@ -210,7 +215,7 @@
      * will be used.
      * TODO: Do we want to return GConfig or provided
      * source object? Which should be the chain's subject?
-     * 
+     *
      * @param  {Object} object    Object to be config.
      * @param  {String} namespace Namespace id
      * @return {GConfig}          Fluid interface.
@@ -221,9 +226,9 @@
     };
 
     /**
-     * Extend the identified namespace with the 
+     * Extend the identified namespace with the
      * given object.
-     *     
+     *
      * @param  {Object} object    Object to be merged.
      * @param  {String} namespace Namespace id.
      * @return {GConfig}          Fluid interface.
@@ -252,7 +257,7 @@
     /**
      * Get a value by key, we can provide a default
      * value in case the key is not registered.
-     * @param  {String} key          Key 
+     * @param  {String} key          Key
      * @param  {Object} defaultValue Default value
      * @param  {String} namespace Namespace id
      * @return {Object}           Key value
@@ -271,32 +276,35 @@
      * We can also pass a second argument to indicate
      * if we want to get a clone of the namespace object
      * or the actual reference.
-     * 
-     * @param  {String} namespace Namespace id
-     * @param  {Boolean} notCloned Should we clone namespace
-     * @return {Object}           Namespace object.
+     *
+     * @param  {String} namespace   Namespace id
+     * @param  {Boolean} clone      Should we clone namespace
+     * @return {Object}             Namespace object.
      */
-    GConfig.prototype.getNamespace = function(namespace, notCloned){
+    GConfig.prototype.getNamespace = function(namespace, clone){
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.data)) return {};
+
+        if(!(namespace in this.data)){
+            if(typeof clone === 'object') return clone;
+            return {};
+        }
+
+        if(clone) return _extend({}, this.data[namespace]);
+
         return this.data[namespace];
-
-        if(notCloned) return this.data[namespace];
-
-        return _extend({}, this.data[namespace]);
     };
 
     /**
      * Simple log implementation.
      */
     GConfig.prototype.log = function(){
-        if(!this.debug) return;
+        if('debug' in this && this.debug === false) return;
         console.log.apply(console, arguments);
     };
 
     //This will eventually be deprecated!
     GConfig.prototype.addMeta = GConfig.prototype.set;
     GConfig.prototype.getMeta = GConfig.prototype.get;
-    
+
     return GConfig;
 }));
