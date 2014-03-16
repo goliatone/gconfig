@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Fri Jul 05 2013 01:57:57 GMT-0400 (EDT)
 /*global basePath:true, exclude:true, reporters:true, files:true*/
-/*global coverageReporter:true, junitReporter:true, reporters:true, 
+/*global coverageReporter:true, junitReporter:true, reporters:true,
 preprocessors:true, frameworks:true*/
 /*global port:true, runnerPort:true, colors:true, logLevel:true*/
 /*global autoWatch:true, browsers:true, captureTimeout:true, singleRun:true*/
