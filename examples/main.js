@@ -4,11 +4,11 @@ requirejs.config({
     paths: {
         'jquery': 'jquery/jquery',
         'gconfig': 'gconfig',
-        'gcppath' :'gconfig.path'
+        'gconfig.path' :'gconfig.path'
     }
 });
 
-define(['gconfig', 'gcppath', 'jquery'], function (GConfig, GCPPath, $) {
+define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
     console.log('Loading');
 	var config = new GConfig();
 
