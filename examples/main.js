@@ -2,20 +2,17 @@
 /* jshint strict: false */
 requirejs.config({
     paths: {
-        'jquery': '../lib/jquery/jquery',
-        'gconfig': '../src/gconfig'
+        'jquery': 'jquery/jquery',
+        'gconfig': 'gconfig',
+        'gconfig.path' :'gconfig.path'
     }
 });
 
-define(['gconfig', 'jquery'], function (GConfig, $) {
+define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
     console.log('Loading');
 	var config = new GConfig();
-	config.use({'log':function(){
-			var args = Array.prototype.slice.call(arguments);
-			args.unshift('GConfig:: ');
-			console.log.apply(console, args);
-		}
-	});
+
+    config.use(GCPPath);
 
 	config.use({'watch':function(){
 		//To make this cross browser safe, for IE < 8 we should
@@ -28,6 +25,7 @@ define(['gconfig', 'jquery'], function (GConfig, $) {
             __appendChild.apply(head, arguments);
         };
 	}});
+
 	config.watch();
 
 	var config2 = new GConfig();
@@ -37,7 +35,7 @@ define(['gconfig', 'jquery'], function (GConfig, $) {
 	config.log(config.get('baseurl'));
 	config.log(config.get('default-controller'));
 
-	var widget  = {'template':'widget-template'}; 
+	var widget  = {'template':'widget-template'};
 	var service = {'serviceUrl':'http://api.example.com/v1/'};
 	console.log('-----');
 	config.log('cf ', config.data);
@@ -55,6 +53,11 @@ define(['gconfig', 'jquery'], function (GConfig, $) {
 	config.configure(vo);
 	config.log('Configured: %o', vo);
 	config.log('Namespace: %o', config.configure({}, 'widget'));
+
+
+    console.log('------------');
+    config.set('app.path', 'some-path');
+    config.log(config.resolve('app.path'));
 
 	window.config = config;
 });
