@@ -9,13 +9,13 @@
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
 (function (root, name, deps, factory) {
-    
+
     // Node
     if(typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
-        
+
     if (typeof exports === 'object') {
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
@@ -34,7 +34,7 @@
         };
     }
     //TODO: Get rid of jquery!
-}(this, 'GConfigQS', function() {
+}(this, 'gconfig.qstring', function() {
 
 
     /**
@@ -55,10 +55,10 @@
             isArr  = Array.isArray,
             query  = query.replace(/\+/g, ' '),
             pairs  = query.split(/[&;]/),
-            pair, 
-            key, 
+            pair,
+            key,
             value;
-     
+
         for (var i = 0; i < pairs.length; i++) {
             pair = pairs[i].match(/^([^=]*)=?(.*)/);
             if(!pair[1]) continue;
@@ -67,7 +67,7 @@
                 key  = decodeURIComponent(pair[1]);
                 value = decodeURIComponent(pair[2]);
             } catch(e) {}
-            
+
             if(!hasOwn.call(out, key)) out[key] = value;
             else if(isArr(out[key])) out[key].push(value);
             else out[key] = [out[key], value];
@@ -120,7 +120,7 @@
             // Serialize scalar item.
             add(prefix, obj);
         }
-    }
+    };
 
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
@@ -128,14 +128,32 @@
 
     /**
      * GConfig constructor
-     * 
+     *
      * @param  {object} config Configuration object.
      */
-    var GConfigQS = function(){};
-    GConfigQS.prototype.queryString = function(){
+    var GConfigQS = {};
 
+    GConfigQS.register = function(GConfig){
+
+        GConfig.prototype.toQueryString = function(){
+            return _stringify(this.data);
+        };
+
+        GConfig.prototype.filterAttributes = function(data){
+            return data;
+        };
+
+        GConfig.CONF_LOADERS.push('loadQueryString');
+
+        GConfig.prototype.loadQueryString = function(queryString){
+            this.log('WE ARE LOADING QUERY STRING');
+            var qs = _queryString(queryString);
+            qs = this.filterAttributes(qs);
+            console.log(qs);
+            window.kk = qs;
+            this.merge(qs);
+        };
     };
 
-    
     return GConfigQS;
 }));
