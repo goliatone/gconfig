@@ -104,15 +104,15 @@
     var encodeKeyValue = function encodeKeyValue(key, value) {
         var removed;
 
-        _each(encoders, function (desc, encoder) {
+        _each(encoders, function(desc, encoder) {
             var needsEncoding = encoder.test;
             var encode = encoder.encode;
             var encoded;
 
-            if (needsEncoding(key, value)) {
+            if(needsEncoding(key, value)) {
                 encoded = encode(key, value);
 
-                if (encoded === false) {
+                if(encoded === false) {
                     removed = true;
                     return false;
                 }
@@ -120,7 +120,7 @@
                 key = encoded[0];
                 value = encoded[1];
 
-                if (encoded[2] && encoded[2].skip) {
+                if(encoded[2] && encoded[2].skip) {
                     return false;
                 }
             }
@@ -135,9 +135,9 @@
         var out = {},
             encoded;
 
-        _each(obj, function (key, value) {
+        _each(obj, function(key, value) {
             encoded = encodeKeyValue(key, value);
-            if (encoded === false) return;
+            if(encoded === false) return;
 
             if(_isObject(encoded[1])) _extend(out, encoded[1]);
             else out[encoded[0]] = encoded[1];
@@ -267,22 +267,20 @@
     var GConfigQS = {};
 
     GConfigQS.register = function(GConfig){
+        GConfig.CONF_LOADERS.push('loadQueryString');
 
         GConfig.prototype.toQueryString = function(){
             return QueryString.stringify(this.data);
         };
 
-        GConfig.prototype.filterAttributes = function(data){
-            return data;
-        };
-
-        GConfig.CONF_LOADERS.push('loadQueryString');
-
         GConfig.prototype.loadQueryString = function(queryString){
-            this.log('WE ARE LOADING QUERY STRING');
             var qs = QueryString.parse(queryString);
             qs = this.filterAttributes(qs);
             this.merge(qs);
+        };
+
+        GConfig.prototype.filterAttributes = function(data){
+            return data;
         };
     };
     window.QueryString = QueryString;
