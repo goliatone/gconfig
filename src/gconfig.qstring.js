@@ -34,93 +34,226 @@
         };
     }
     //TODO: Get rid of jquery!
-}(this, 'gconfig.qstring', function() {
+}(this, 'gconfig.qstring', ['jquery'], function($) {
 
 
+    var _isArray = ('isArray' in Array) ? Array.isArray : function (value) { return Object.prototype.toString.call(value) === '[object Array]';};
+    var _isObject = function(obj){
+        return typeof obj === 'object';
+    };
+
+    var _each = $.each;
     /**
-     * Parse query string into object.
-     * @param   {String|undefined} query String to parse
-     *                                   If undefined, location search
-     *                                   is used.
-     * @return  {Object}       Query string object.
-     * @private
+     * Extend method.
+     * @param  {Object} target Source object
+     * @return {Object}        Resulting object from
+     *                         meging target to params.
      */
-    var _queryString = function _queryString(query) {
-        if (typeof query !== 'string') query =  window.location.search;
+    var _extend = $.extend;
 
-        if(query.indexOf('?') === 0) query = query.substring(1);
-
-        var out = {},
-            hasOwn = out.hasOwnProperty,
-            isArr  = Array.isArray,
-            query  = query.replace(/\+/g, ' '),
-            pairs  = query.split(/[&;]/),
-            pair,
-            key,
-            value;
-
-        for (var i = 0; i < pairs.length; i++) {
-            pair = pairs[i].match(/^([^=]*)=?(.*)/);
-            if(!pair[1]) continue;
-
-            try {
-                key  = decodeURIComponent(pair[1]);
-                value = decodeURIComponent(pair[2]);
-            } catch(e) {}
-
-            if(!hasOwn.call(out, key)) out[key] = value;
-            else if(isArr(out[key])) out[key].push(value);
-            else out[key] = [out[key], value];
+    var encoders = {
+        'encode array':{
+            test: function (key, value) { return _isArray(value); },
+            encode: function (key, value) { return [key.replace(/\[|\]/g, ''), value.join('|')]; }
+        },
+        'encode object': {
+            test: function (key, value) { return _isObject(value); },
+            encode: function (key, value) { return [key, serializeObject(value, key), {'skip': true}]; }
+        },
+        'delete empty values':{
+            test: function (key, value) { return value === ''; },
+            encode: function (key, value) { return false; }
+        },
+        'encode':{
+            test: function (key, value) { return true; },
+            encode: function (key, value) { return [encodeURIComponent(key), encodeURIComponent(value)]; }
+        },
+        'convert spaces to +': {
+            test: function (key, value) { return true; },
+            encode: function (key, value) { return [key, value.replace(/%20/g, '+')]; }
+        },
+        'convert encoded pipes to |':{
+            test: function (key, value) { return true; },
+            encode: function (key, value) { return [key, value.replace(/%7C/g, '|')]; }
         }
+    };
+
+    var decoders = {
+        'decode':{
+            test: function (key, value) { return true; },
+            decode: function (key, value) { return [decodeURIComponent(key), decodeURIComponent(value)]; }
+        },
+        'decode + to space':{
+            test: function (key, value) { return true; },
+            decode: function (key, value) { return [key, value.replace(RE_PLUS, ' ')]; }
+        },
+        'decode pipes to array': {
+            test: function (key, value) { return /\|/.test(value); },
+            decode: function (key, value) { return [key, value.split('|')]; }
+        },
+        'decode stringified object': {
+            test: function (key, value) { return /\[/.test(key); },
+            decode: function (key, value) { return [key, unserializeObject(key, value)]; }
+        }
+    };
+
+
+    var RE_PLUS = /\+/g;
+    var RE_PAIR = /([^&=]+)=?([^&]*)/g;
+
+    var encodeKeyValue = function encodeKeyValue(key, value) {
+        var removed;
+
+        _each(encoders, function (desc, encoder) {
+            var needsEncoding = encoder.test;
+            var encode = encoder.encode;
+            var encoded;
+
+            if (needsEncoding(key, value)) {
+                encoded = encode(key, value);
+
+                if (encoded === false) {
+                    removed = true;
+                    return false;
+                }
+
+                key = encoded[0];
+                value = encoded[1];
+
+                if (encoded[2] && encoded[2].skip) {
+                    return false;
+                }
+            }
+        });
+
+        if (removed) return false;
+
+        return [key, value];
+    };
+
+    var encodeObject = function encodeObject(obj) {
+        var out = {},
+            encoded;
+
+        _each(obj, function (key, value) {
+            encoded = encodeKeyValue(key, value);
+            if (encoded === false) return;
+
+            if(_isObject(encoded[1])) _extend(out, encoded[1]);
+            else out[encoded[0]] = encoded[1];
+        });
+
         return out;
     };
 
-    /**
-     * Object to query string
-     * TODO: Make for realz.
-     * @param   {Object} obj Object to be serialized
-     * @return  {String}     Serialized string
-     * @private
-     */
-    var _stringify = function (a) {
-        var prefix, s, add, name, r20, output;
-        out = [];
-        r20 = /%20/g;
-        add = function (key, value) {
-            // If value is a function, invoke it and return its value
-            value = ( typeof value == 'function' ) ? value() : ( value == null ? "" : value );
-            out[out.length] = encodeURIComponent(key) + "=" + encodeURIComponent(value);
-        };
-        if (a instanceof Array) {
-            for (name in a) add(name, a[name]);
-        } else {
-            for (prefix in a) _buildParams(prefix, a[ prefix ], add);
-        }
+    var serializeObject = function serializeObject(obj, prefix) {
+        var flatObject = {},
+            flatKey;
 
-        return out.join("&").replace(r20, "+");
+        prefix = prefix || '';
+
+        _each(obj, function (key, value) {
+            key = encodeKeyValue(key, 'ignore')[0];
+            flatKey = prefix + '[' + key + ']';
+
+            if (_isObject(value)) {
+                _extend(flatObject, serializeObject(value, flatKey));
+            } else {
+                value = encodeKeyValue('ignore', value)[1];
+                flatObject[flatKey] = value;
+            }
+        });
+
+        return flatObject;
     };
 
-    var _buildParams = function _buildParams(prefix, obj, add) {
-        var name, i, l, rbracket;
-        rbracket = /\[\]$/;
-        if (obj instanceof Array) {
-            for (i = 0, l = obj.length; i < l; i++) {
-                if (rbracket.test(prefix)) {
-                    add(prefix, obj[i]);
-                } else {
-                    buildParams(prefix + "[" + ( typeof obj[i] === "object" ? i : "" ) + "]", obj[i], add);
+    var unserializeObject = function unserializeObject(key, value) {
+        var temp = key.split('[', 2),
+            keyParts = [temp[0]].concat(temp[1].split(/\/\]\[|\]/)),
+            object = {},
+            tempObj = object,
+            prevKeyPart;
+
+        _each(keyParts, function (i, keyPart) {
+            if (keyPart !== '') {
+                tempObj[keyPart] = {};
+
+                if (keyParts[i + 1] !== '') {
+                    tempObj = tempObj[keyPart];
+                }
+            } else {
+                tempObj[prevKeyPart ] = value;
+            }
+
+            prevKeyPart  = keyPart;
+        });
+
+        return object;
+    };
+
+    var objectToQueryString = function objectToQueryString(obj, startChar) {
+        var out = encodeObject(obj);
+        var encodedKeyValues = [];
+
+        _each(out, function (key, value) {
+            encodedKeyValues.push(key + '=' + value);
+        });
+
+        if (encodedKeyValues.length) {
+            startChar = startChar || '?';
+            return startChar + encodedKeyValues.join('&');
+        }
+
+        return '';
+    };
+
+    var decodeKeyValue = function decodeKeyValue(key, value) {
+        _each(decoders, function (desc, decoder) {
+            var needsDecoding = decoder.test;
+            var decode = decoder.decode;
+            var decoded;
+
+            if (needsDecoding(key, value)) {
+                decoded = decode(key, value);
+
+                key = decoded[0];
+                value = decoded[1];
+
+                if (decoded[2] && decoded[2].skip) {
+                    return false;
                 }
             }
-        } else if (typeof obj == "object") {
-            // Serialize object item.
-            for (name in obj) {
-                buildParams(prefix + "[" + name + "]", obj[ name ], add);
-            }
-        } else {
-            // Serialize scalar item.
-            add(prefix, obj);
-        }
+        });
+
+        return [key, value];
     };
+
+    var queryStringToObject = function queryStringToObject(str) {
+        var decodedObject = {};
+        if(!str || str.length === 0) return decodedObject;
+        var match;
+
+        if (str[0] === '?') str = str.slice(1);
+
+
+        while (match = RE_PAIR.exec(str)) {
+            (function (key, value) {
+                var decoded = decodeKeyValue(key, value);
+
+                if (_isObject(decoded[1])) {
+                    _extend(true, decodedObject, decoded[1]);
+                } else {
+                    decodedObject[decoded[0]] = decoded[1];
+                }
+            }(match[1], match[2]));
+        }
+
+        return decodedObject;
+    };
+
+    var QueryString = {};
+    QueryString.stringify = objectToQueryString;
+    QueryString.parse = queryStringToObject;
 
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
@@ -136,7 +269,7 @@
     GConfigQS.register = function(GConfig){
 
         GConfig.prototype.toQueryString = function(){
-            return _stringify(this.data);
+            return QueryString.stringify(this.data);
         };
 
         GConfig.prototype.filterAttributes = function(data){
@@ -147,13 +280,11 @@
 
         GConfig.prototype.loadQueryString = function(queryString){
             this.log('WE ARE LOADING QUERY STRING');
-            var qs = _queryString(queryString);
+            var qs = QueryString.parse(queryString);
             qs = this.filterAttributes(qs);
-            console.log(qs);
-            window.kk = qs;
             this.merge(qs);
         };
     };
-
+    window.QueryString = QueryString;
     return GConfigQS;
 }));
