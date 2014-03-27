@@ -178,6 +178,8 @@
         }).bind(this), 0);*/
     };
 
+    GConfig.prototype.emit = function(){};
+
     GConfig.prototype.init = function(){
         if(this.initialized) return;
         this.initialized = true;
