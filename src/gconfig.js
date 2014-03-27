@@ -110,7 +110,7 @@
         this.namespace = options.namespace;
 
         //TODO: Should we do methods instead of strings?
-        this.loaders = ['loadMedatada'];
+        this.loaders = GConfig.CONF_LOADERS;
         this.loadMedatada.async = false;
 
         this.initialized = false;
@@ -118,6 +118,7 @@
         this.init();
     };
 
+    GConfig.CONF_LOADERS = ['loadMedatada'];
 ///////////////////////////////////////////////////
 // PRIVATE METHODS
 ///////////////////////////////////////////////////
@@ -133,6 +134,7 @@
         //TODO: We should provide a next to each loader
         //to step forward on the chain.
         this.loaders.forEach(function(loader){
+            this.log('Load data using', loader);
             this[loader].call(this);
         }, this);
         this.onConfigLoaded();
@@ -185,9 +187,9 @@
     };
 
     /**
-     * TODO: Review plugin procedure. We want to pass 
+     * TODO: Review plugin procedure. We want to pass
      *       GConfig to plugin to extend and initialize.
-     * 
+     *
      * Extends GConfig's prototype. Use it to add
      * functionality or to override methods. The
      * idea is to support a plugin architecture.
@@ -197,7 +199,7 @@
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext){
-
+        if(! ext) return this;
 
         if(typeof ext === 'function') ext(GConfig);
         else if('register' in ext &&
@@ -205,6 +207,15 @@
         else if(typeof ext === 'object') _extend(GConfig.prototype, ext);
 
         return this;
+    };
+
+    GConfig.use = function(ext){
+        if(! ext) return;
+
+        if(typeof ext === 'function') ext(GConfig);
+        else if('register' in ext &&
+            typeof ext.register === 'function') ext.register(GConfig);
+        else if(typeof ext === 'object') _extend(GConfig.prototype, ext);
     };
 
     /**
@@ -234,7 +245,7 @@
      * @return {GConfig}          Fluid interface.
      */
     GConfig.prototype.merge = function(object, namespace){
-        _extend(this.getNamespace(namespace), object);
+        _extend(this.getNamespace(namespace, this.data), object);
         return this;
     };
 
