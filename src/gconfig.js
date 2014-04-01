@@ -60,28 +60,31 @@
         return target;
     };
 
-    /**
-     * Proxy method
-     * @param  {Function} fn      Function to be proxied
-     * @param  {Object}   context Context for the method.
-     */
-    var _proxy = function( fn, context ) {
-        var tmp, args, proxy, slice = Array.prototype.slice;
+    var _map = function(arr, done) {
+        var i    = -1,
+            len  = arr.length,
+            args = Array.prototype.slice.call(arguments, 2);
+        (function next(result) {
+            var each,
+                async,
+                abort = (typeof result === 'boolean');
 
-        if ( typeof context === 'string') {
-            tmp = fn[ context ];
-            context = fn;
-            fn = tmp;
-        }
+            do{ ++i; } while (!(i in arr) && i !== len);
 
-        if ( ! typeof(fn) === 'function') return undefined;
+            if (abort || i === len) {
+                if(done) return done(result);
+            }
 
-        args = slice.call(arguments, 2);
-        proxy = function() {
-            return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
-        };
+            each = arr[i];
+            result = each.apply({
+                async: function() {
+                    async = true;
+                    return next;
+                }
+            }, args);
 
-        return proxy;
+            if (!async) next(result);
+        }());
     };
 
     var options = {
@@ -100,7 +103,10 @@
      * @param  {object} config Configuration object.
      */
     var GConfig = function(config){
-        _extend(options, config || {});
+
+        config  = config || {};
+
+        config = _extend({}, GConfig.defaults || options, config);
 
         this.data = {};
         this.meta = document.getElementsByTagName('meta');
@@ -115,8 +121,10 @@
 
         this.initialized = false;
 
-        this.init();
+        this.init(config);
     };
+
+    GConfig.defaults = options;
 
 ///////////////////////////////////////////////////
 // PRIVATE METHODS
@@ -132,6 +140,11 @@
     {
         //TODO: We should provide a next to each loader
         //to step forward on the chain.
+        var onLoadersDone = function(){
+            console.log('DONE!!!')
+        }.bind(this);
+        _map(this.loaders, onLoadersDone, this);
+
         this.loaders.forEach(function(loader){
             this[loader].call(this);
         }, this);
@@ -176,10 +189,12 @@
         }).bind(this), 0);*/
     };
 
-    GConfig.prototype.init = function(){
+    GConfig.prototype.init = function(config){
         if(this.initialized) return;
         this.initialized = true;
-        // var addMetaCallback = _proxy(this.set, this);
+
+        _extend(this, config);
+
         this.getConfig( );
         this.log('META: ', this.data);
     };
