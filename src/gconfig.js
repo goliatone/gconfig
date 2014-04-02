@@ -116,7 +116,8 @@
         this.namespace = options.namespace;
 
         //TODO: Should we do methods instead of strings?
-        this.loaders = ['loadMedatada'];
+        //this.loaders = ['loadMedatada'];
+        this.loaders = [this.loadMedatada.bind(this)];
         this.loadMedatada.async = false;
 
         this.initialized = false;
@@ -141,14 +142,10 @@
         //TODO: We should provide a next to each loader
         //to step forward on the chain.
         var onLoadersDone = function(){
-            console.log('DONE!!!')
+            this.onConfigLoaded();
         }.bind(this);
+        
         _map(this.loaders, onLoadersDone, this);
-
-        this.loaders.forEach(function(loader){
-            this[loader].call(this);
-        }, this);
-        this.onConfigLoaded();
     };
 
     /**
