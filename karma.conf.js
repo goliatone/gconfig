@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Fri Jul 05 2013 01:57:57 GMT-0400 (EDT)
 /*global basePath:true, exclude:true, reporters:true, files:true*/
-/*global coverageReporter:true, junitReporter:true, reporters:true, 
+/*global coverageReporter:true, junitReporter:true, reporters:true,
 preprocessors:true, frameworks:true*/
 /*global port:true, runnerPort:true, colors:true, logLevel:true*/
 /*global autoWatch:true, browsers:true, captureTimeout:true, singleRun:true*/
@@ -29,7 +29,6 @@ module.exports = function(config) {
         frameworks: ['jasmine', 'requirejs'],
 
         plugins: [
-            'karma-qunit',
             'karma-jasmine',
             'karma-requirejs',
             'karma-coverage',
@@ -52,7 +51,7 @@ module.exports = function(config) {
 
         coverageReporter: {
             type : ['text'],
-            dir : 'coverage/'
+            dir : '.coverage/'
             // type: 'cobertura',
             // dir: 'coverage/',
             // file: 'coverage.xml'
@@ -69,8 +68,8 @@ module.exports = function(config) {
 
         // level of logging
         // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-        logLevel: config.LOG_DISABLE,
-        // logLevel: config.LOG_DEBUG,
+        // logLevel: config.LOG_DISABLE,
+        logLevel: config.LOG_DEBUG,
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,

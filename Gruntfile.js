@@ -1,11 +1,6 @@
 'use strict';
 var lrSnippet = require('grunt-contrib-livereload/lib/utils').livereloadSnippet;
-var mountFolder = function (connect, dir, next) {
-    if(next){
-        connect.static(require('path').resolve(dir));
-        next();
-    }
-
+var mountFolder = function (connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
 
@@ -14,95 +9,65 @@ module.exports = function (grunt) {
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
     // configurable paths
-    var yeomanConfig = {
-        name: 'gconfig',
+    var config = {
+        name: 'gmodel',
         src: 'src',
         dist: 'dist',
+        libs: 'lib',
         example:'examples'
     };
 
     try {
-        yeomanConfig.src = require('./component.json').appPath || yeomanConfig.example;
+        config.src = require('./component.json').appPath || config.src;
     } catch (e) {}
 
     grunt.initConfig({
-        yeoman: yeomanConfig,
+        config: config,
         livereload:{
             port: 35723
         },
         watch: {
             livereload: {
                 files: [
-                    '<%= yeoman.example %>/{,*/}*.html',
-                    '{.tmp,<%= yeoman.example %>}/styles/{,*/}*.css',
-                    '{.tmp,<%= yeoman.example %>}/scripts/{,*/}*.js',
-                    '<%= yeoman.example %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+                    '<%= config.example %>/*.html',
+                    '<%= config.example %>/*.js',
+                    '{.tmp,<%= config.src %>}/*.js'
                 ],
                 tasks: ['livereload']
             }
         },
         connect: {
             options: {
-                port: 9030,
+                port: 9100,
                 // Change this to '0.0.0.0' to access the server from outside.
-                hostname: 'localhost',
-                base:'./example'
+                hostname: 'localhost'
             },
             livereload: {
                 options: {
                     middleware: function (connect) {
                         return [
                             lrSnippet,
-                            // mountFolder(connect, '.tmp'),
-                            mountFolder(connect, yeomanConfig.example)
+                            mountFolder(connect, '.tmp'),
+                            mountFolder(connect, config.src),
+                            mountFolder(connect, config.libs),
+                            mountFolder(connect, config.example)
                         ];
                     }
                 }
             },
             test: {
                 options: {
+                    port:4545,
                     middleware: function (connect) {
                         return [
                             mountFolder(connect, '.tmp'),
-                            mountFolder(connect, 'test'),
+                            mountFolder(connect, 'test')
                         ];
                     }
                 }
             },
             dev:{
-                options: {
-                    /*middleware: function (connect, res, next) {
-                        console.log('middleware ', arguments.length);
-                        return [
-                            mountFolder(connect, yeomanConfig.example, next),
-                            // mountFolder(connect, '.', next)
-                        ];
-                    },*/
-                    mappings: [
-                        {
-                            prefix: '/preview',
-                            src: 'preview/'
-                        },
-                        {
-                            prefix: '/',
-                            src: [ 'examples/' ]
-                        },
-                        {
-                            prefix: '/readme',
-                            src: function ( req ) {
-                                var markdown, html, style;
-
-                                markdown = grunt.file.read( 'README.md' );
-                                console.log('We are here ', markdown);
-                                html = require( 'markdown' ).markdown.toHTML( markdown );
-
-                                style = '<style>body {font-family: "Helvetica Neue", "Arial"; font-size: 16px; color: #333; } pre { background-color: #eee; padding: 0.5em; } hr { margin: 2em 0 }</style>';
-
-                                return style + html;
-                            }
-                        }
-                    ]
-                }
+                options: {}
             }
         },
         open: {
@@ -116,8 +81,8 @@ module.exports = function (grunt) {
                     dot: true,
                     src: [
                         '.tmp',
-                        '<%= yeoman.dist %>/*',
-                        '!<%= yeoman.dist %>/.git*'
+                        '<%= config.dist %>/*',
+                        '!<%= config.dist %>/.git*'
                     ]
                 }]
             },
@@ -129,17 +94,21 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.src %>/{,*/}*.js'
+                '<%= config.src %>/{,*/}*.js'
             ]
         },
         karma: {
             options: {
                 configFile: 'karma.conf.js',
-                runnerPort: 9999,
-                browsers: ['Chrome']
+                runnerPort: 9999
+                // browsers: ['Chrome', 'Firefox']
             },
             unit: {
                 reporters: 'dots'
+            },
+            debug:{
+                singleRun:false,
+                browsers:['Chrome']
             },
             ci: {
                 singleRun: true,
@@ -149,9 +118,9 @@ module.exports = function (grunt) {
         concat: {
             dist: {
                 files: {
-                    '<%= yeoman.dist %>/<%= yeoman.name %>.js': [
+                    '<%= config.dist %>/<%= config.name %>.js': [
                         '.tmp/{,*/}*.js',
-                        '<%= yeoman.src %>/{,*/}*.js'
+                        '<%= config.src %>/{,*/}*.js'
                     ]
                 }
             }
@@ -159,8 +128,8 @@ module.exports = function (grunt) {
         uglify: {
             dist: {
                 files: {
-                    '<%= yeoman.dist %>/<%= yeoman.name %>.min.js': [
-                        '<%= yeoman.dist %>/<%= yeoman.name %>.js'
+                    '<%= config.dist %>/<%= config.name %>.min.js': [
+                        '<%= config.dist %>/<%= config.name %>.js'
                     ]
                 }
             }
@@ -170,8 +139,8 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     dot: true,
-                    cwd: '<%= yeoman.src %>',
-                    dest: '<%= yeoman.dist %>',
+                    cwd: '<%= config.src %>',
+                    dest: '<%= config.dist %>',
                     src: []
                 }]
             }

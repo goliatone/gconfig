@@ -9,13 +9,13 @@
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
 (function (root, name, deps, factory) {
-    
+
     // Node
     if(typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
-        
+
     if (typeof exports === 'object') {
         module.exports = factory.apply(root, deps.map(require));
     } else if (typeof define === 'function' && 'amd' in define) {
@@ -33,7 +33,6 @@
             return mod;
         };
     }
-    //TODO: Get rid of jquery!
 }(this, 'GConfig', function() {
 
 
@@ -61,71 +60,111 @@
         return target;
     };
 
-    /**
-     * Proxy method
-     * @param  {Function} fn      Function to be proxied
-     * @param  {Object}   context Context for the method.
-     */
-    var _proxy = function( fn, context ) {
-        var tmp, args, proxy, slice = Array.prototype.slice;
+    var _map = function(arr, done) {
+        var i    = -1,
+            len  = arr.length,
+            args = Array.prototype.slice.call(arguments, 2);
+        (function next(result) {
+            var each,
+                async,
+                abort = (typeof result === 'boolean');
 
-        if ( typeof context === 'string') {
-            tmp = fn[ context ];
-            context = fn;
-            fn = tmp;
-        }
+            do{ ++i; } while (!(i in arr) && i !== len);
 
-        if ( ! typeof(fn) === 'function') return undefined;
+            if (abort || i === len) {
+                if(done) return done(result);
+            }
 
-        args = slice.call(arguments, 2);
-        proxy = function() {
-            return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
-        };
+            each = arr[i];
+            result = each.apply({
+                async: function() {
+                    async = true;
+                    return next;
+                }
+            }, args);
 
-        return proxy;
+            if (!async) next(result);
+        }());
     };
 
-    var options = {
-        //http://stackoverflow.com/questions/7602410/how-do-i-find-elements-that-contain-a-data-attribute-matching-a-prefix-using-j
-        selector:'meta[name^="::NAMESPACE::-"]',
-        namespace:'app'
+    /**
+     * Shim console, make sure that if no console
+     * available calls do not generate errors.
+     * @return {Object} Console shim.
+     */
+    var _shimConsole = function(){
+        var empty = {},
+            con   = {},
+            noop  = function() {},
+            properties = 'memory'.split(','),
+            methods = ('assert,clear,count,debug,dir,dirxml,error,exception,group,' +
+                       'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
+                       'table,time,timeEnd,timeStamp,trace,warn').split(','),
+            prop,
+            method;
+
+        while (method = methods.pop())    con[method] = noop;
+        while (prop   = properties.pop()) con[prop]   = empty;
+
+        return con;
     };
 
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
 ///////////////////////////////////////////////////
+    
+    var _OPTIONS = {
+        selector:'meta[name^="::NAMESPACE::-"]',
+        namespace:'app'
+    };
 
     /**
      * GConfig constructor
-     * 
+     *
      * @param  {object} config Configuration object.
      */
     var GConfig = function(config){
-        _extend(options, config || {});
+
+        config  = config || {};
+
+        config = _extend({}, GConfig.defaults || _OPTIONS, config);
 
         this.data = {};
         this.meta = document.getElementsByTagName('meta');
-        
+
         this.namespaces = [];
         this.options = options;
         this.namespace = options.namespace;
 
         //TODO: Should we do methods instead of strings?
-        this.loaders = ['loadMedatada'];
-        this.loadMedatada.async = false;
+        !this.loaders && (this.loaders = []);
+
+        this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
 
         this.initialized = false;
 
-        this.init();
+        this.init(config);
     };
 
+    GConfig.defaults = _OPTIONS;
+
 ///////////////////////////////////////////////////
-// PRIVATE METHODS
+// PUBLIC METHODS
 ///////////////////////////////////////////////////
     
+    GConfig.prototype.init = function(config){
+        if(this.initialized) return;
+        this.initialized = true;
+        config  = config || {};
+        _extend(this, config);
+
+        this.getConfig( );
+        this.logger.log('META: ', this.data);
+    };
+
     /**
      * Method that triggers data loaders.
-     * By default, we use `loadMetadata` a 
+     * By default, we use `loadMetadata` a
      * synchronous loader.
      * @return {GConfig}    Fluid interface.
      */
@@ -133,10 +172,11 @@
     {
         //TODO: We should provide a next to each loader
         //to step forward on the chain.
-        this.loaders.forEach(function(loader){
-            this[loader].call(this);
-        }, this);
-        this.onConfigLoaded();
+        var onLoadersDone = function(){
+            this.onConfigLoaded();
+        }.bind(this);
+        
+        _map(this.loaders, onLoadersDone, this);
     };
 
     /**
@@ -175,15 +215,7 @@
         /*setTimeout((function(){
             this.emit('ondata');
         }).bind(this), 0);*/
-    };
-
-    GConfig.prototype.init = function(){
-        if(this.initialized) return;
-        this.initialized = true;
-        // var addMetaCallback = _proxy(this.set, this);
-        this.getConfig( );
-        this.log('META: ', this.data);
-    };
+    };   
 
     /**
      * TODO: Review plugin procedure. We want to pass 
@@ -193,12 +225,16 @@
      * functionality or to override methods. The
      * idea is to support a plugin architecture.
      * @param  {Object} ext Object which's properties and
-     *                      methods will get merged into 
+     *                      methods will get merged into
      *                      GConfig's prototype
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext){
-        _extend(GConfig.prototype, ext);
+        if(typeof ext === 'function') ext(GConfig);
+        else if('register' in ext &&
+            typeof ext.register === 'function') ext.register(GConfig);
+        else if(typeof ext === 'object') _extend(GConfig.prototype, ext);
+
         return this;
     };
 
@@ -210,7 +246,7 @@
      * will be used.
      * TODO: Do we want to return GConfig or provided
      * source object? Which should be the chain's subject?
-     * 
+     *
      * @param  {Object} object    Object to be config.
      * @param  {String} namespace Namespace id
      * @return {GConfig}          Fluid interface.
@@ -221,9 +257,9 @@
     };
 
     /**
-     * Extend the identified namespace with the 
+     * Extend the identified namespace with the
      * given object.
-     *     
+     *
      * @param  {Object} object    Object to be merged.
      * @param  {String} namespace Namespace id.
      * @return {GConfig}          Fluid interface.
@@ -241,8 +277,7 @@
      * @return {GConfig}          Fluid interface.
      */
     GConfig.prototype.set = function(key, value, namespace){
-        //TODO: Make bindable.
-        this.log('Adding: %s::%s under %s.', key, value, namespace);
+        this.logger.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
@@ -252,7 +287,7 @@
     /**
      * Get a value by key, we can provide a default
      * value in case the key is not registered.
-     * @param  {String} key          Key 
+     * @param  {String} key          Key
      * @param  {Object} defaultValue Default value
      * @param  {String} namespace Namespace id
      * @return {Object}           Key value
@@ -271,32 +306,46 @@
      * We can also pass a second argument to indicate
      * if we want to get a clone of the namespace object
      * or the actual reference.
-     * 
-     * @param  {String} namespace Namespace id
-     * @param  {Boolean} notCloned Should we clone namespace
-     * @return {Object}           Namespace object.
+     *
+     * @param  {String} namespace   Namespace id
+     * @param  {Boolean} clone      Should we clone namespace
+     * @return {Object}             Namespace object.
      */
-    GConfig.prototype.getNamespace = function(namespace, notCloned){
+    GConfig.prototype.getNamespace = function(namespace, clone){
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.data)) return {};
+
+        if(!(namespace in this.data)){
+            if(typeof clone === 'object') return clone;
+            return {};
+        }
+
+        if(clone) return _extend({}, this.data[namespace]);
+
         return this.data[namespace];
-
-        if(notCloned) return this.data[namespace];
-
-        return _extend({}, this.data[namespace]);
     };
 
     /**
      * Simple log implementation.
      */
-    GConfig.prototype.log = function(){
-        if(!this.debug) return;
-        console.log.apply(console, arguments);
+    GConfig.prototype.logger = console || _shimConsole();
+
+    /**
+     * TODO: We should do this at a global scope? Meaning before
+     *       We create the instance?! Hoe we do this
+     * Resource loader manager
+     * @param {String} id     ID of resource loader.
+     * @param {Function} loader Resource loader.
+     */
+    GConfig.prototype.addResourceLoader = function(id, loader, index){
+        // this.loaders[id] = loader;
+        if(index !== undefined) this.loaders.splice(index, 0, loader);
+        else this.loaders.push(loader);
+        return this;
     };
 
     //This will eventually be deprecated!
     GConfig.prototype.addMeta = GConfig.prototype.set;
     GConfig.prototype.getMeta = GConfig.prototype.get;
-    
+
     return GConfig;
 }));
