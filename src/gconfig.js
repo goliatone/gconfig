@@ -87,15 +87,36 @@
         }());
     };
 
-    var options = {
-        //http://stackoverflow.com/questions/7602410/how-do-i-find-elements-that-contain-a-data-attribute-matching-a-prefix-using-j
-        selector:'meta[name^="::NAMESPACE::-"]',
-        namespace:'app'
+    /**
+     * Shim console, make sure that if no console
+     * available calls do not generate errors.
+     * @return {Object} Console shim.
+     */
+    var _shimConsole = function(){
+        var empty = {},
+            con   = {},
+            noop  = function() {},
+            properties = 'memory'.split(','),
+            methods = ('assert,clear,count,debug,dir,dirxml,error,exception,group,' +
+                       'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
+                       'table,time,timeEnd,timeStamp,trace,warn').split(','),
+            prop,
+            method;
+
+        while (method = methods.pop())    con[method] = noop;
+        while (prop   = properties.pop()) con[prop]   = empty;
+
+        return con;
     };
 
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
 ///////////////////////////////////////////////////
+    
+    var _OPTIONS = {
+        selector:'meta[name^="::NAMESPACE::-"]',
+        namespace:'app'
+    };
 
     /**
      * GConfig constructor
@@ -106,7 +127,7 @@
 
         config  = config || {};
 
-        config = _extend({}, GConfig.defaults || options, config);
+        config = _extend({}, GConfig.defaults || _OPTIONS, config);
 
         this.data = {};
         this.meta = document.getElementsByTagName('meta');
@@ -125,10 +146,7 @@
         this.init(config);
     };
 
-    GConfig.defaults = options;
-
-
-    
+    GConfig.defaults = _OPTIONS;
 
 ///////////////////////////////////////////////////
 // PUBLIC METHODS
@@ -137,11 +155,11 @@
     GConfig.prototype.init = function(config){
         if(this.initialized) return;
         this.initialized = true;
-
+        config  = config || {};
         _extend(this, config);
 
         this.getConfig( );
-        this.log('META: ', this.data);
+        this.logger.log('META: ', this.data);
     };
 
     /**
@@ -256,8 +274,7 @@
      * @return {GConfig}          Fluid interface.
      */
     GConfig.prototype.set = function(key, value, namespace){
-        //TODO: Make bindable.
-        this.log('Adding: %s::%s under %s.', key, value, namespace);
+        this.logger.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
@@ -307,10 +324,7 @@
     /**
      * Simple log implementation.
      */
-    GConfig.prototype.log = function(){
-        if('debug' in this && this.debug === false) return;
-        console.log.apply(console, arguments);
-    };
+    GConfig.prototype.logger = console || _shimConsole();
 
     /**
      * TODO: We should do this at a global scope? Meaning before
