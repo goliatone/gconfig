@@ -60,39 +60,63 @@
         return target;
     };
 
-    /**
-     * Proxy method
-     * @param  {Function} fn      Function to be proxied
-     * @param  {Object}   context Context for the method.
-     */
-    var _proxy = function( fn, context ) {
-        var tmp, args, proxy, slice = Array.prototype.slice;
+    var _map = function(arr, done) {
+        var i    = -1,
+            len  = arr.length,
+            args = Array.prototype.slice.call(arguments, 2);
+        (function next(result) {
+            var each,
+                async,
+                abort = (typeof result === 'boolean');
 
-        if ( typeof context === 'string') {
-            tmp = fn[ context ];
-            context = fn;
-            fn = tmp;
-        }
+            do{ ++i; } while (!(i in arr) && i !== len);
 
-        if ( ! typeof(fn) === 'function') return undefined;
+            if (abort || i === len) {
+                if(done) return done(result);
+            }
 
-        args = slice.call(arguments, 2);
-        proxy = function() {
-            return fn.apply( context || this, args.concat( slice.call( arguments ) ) );
-        };
+            each = arr[i];
+            result = each.apply({
+                async: function() {
+                    async = true;
+                    return next;
+                }
+            }, args);
 
-        return proxy;
+            if (!async) next(result);
+        }());
     };
 
-    var options = {
-        //http://stackoverflow.com/questions/7602410/how-do-i-find-elements-that-contain-a-data-attribute-matching-a-prefix-using-j
-        selector:'meta[name^="::NAMESPACE::-"]',
-        namespace:'app'
+    /**
+     * Shim console, make sure that if no console
+     * available calls do not generate errors.
+     * @return {Object} Console shim.
+     */
+    var _shimConsole = function(){
+        var empty = {},
+            con   = {},
+            noop  = function() {},
+            properties = 'memory'.split(','),
+            methods = ('assert,clear,count,debug,dir,dirxml,error,exception,group,' +
+                       'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
+                       'table,time,timeEnd,timeStamp,trace,warn').split(','),
+            prop,
+            method;
+
+        while (method = methods.pop())    con[method] = noop;
+        while (prop   = properties.pop()) con[prop]   = empty;
+
+        return con;
     };
 
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
 ///////////////////////////////////////////////////
+    
+    var _OPTIONS = {
+        selector:'meta[name^="::NAMESPACE::-"]',
+        namespace:'app'
+    };
 
     /**
      * GConfig constructor
@@ -100,7 +124,10 @@
      * @param  {object} config Configuration object.
      */
     var GConfig = function(config){
-        _extend(options, config || {});
+
+        config  = config || {};
+
+        config = _extend({}, GConfig.defaults || _OPTIONS, config);
 
         this.data = {};
         this.meta = document.getElementsByTagName('meta');
@@ -110,17 +137,30 @@
         this.namespace = options.namespace;
 
         //TODO: Should we do methods instead of strings?
-        this.loaders = ['loadMedatada'];
-        this.loadMedatada.async = false;
+        !this.loaders && (this.loaders = []);
+
+        this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
 
         this.initialized = false;
 
-        this.init();
+        this.init(config);
     };
 
+    GConfig.defaults = _OPTIONS;
+
 ///////////////////////////////////////////////////
-// PRIVATE METHODS
+// PUBLIC METHODS
 ///////////////////////////////////////////////////
+    
+    GConfig.prototype.init = function(config){
+        if(this.initialized) return;
+        this.initialized = true;
+        config  = config || {};
+        _extend(this, config);
+
+        this.getConfig( );
+        this.logger.log('META: ', this.data);
+    };
 
     /**
      * Method that triggers data loaders.
@@ -132,10 +172,11 @@
     {
         //TODO: We should provide a next to each loader
         //to step forward on the chain.
-        this.loaders.forEach(function(loader){
-            this[loader].call(this);
-        }, this);
-        this.onConfigLoaded();
+        var onLoadersDone = function(){
+            this.onConfigLoaded();
+        }.bind(this);
+        
+        _map(this.loaders, onLoadersDone, this);
     };
 
     /**
@@ -174,15 +215,7 @@
         /*setTimeout((function(){
             this.emit('ondata');
         }).bind(this), 0);*/
-    };
-
-    GConfig.prototype.init = function(){
-        if(this.initialized) return;
-        this.initialized = true;
-        // var addMetaCallback = _proxy(this.set, this);
-        this.getConfig( );
-        this.log('META: ', this.data);
-    };
+    };   
 
     /**
      * Extends GConfig's prototype. Use it to add
@@ -194,8 +227,6 @@
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext){
-
-
         if(typeof ext === 'function') ext(GConfig);
         else if('register' in ext &&
             typeof ext.register === 'function') ext.register(GConfig);
@@ -243,8 +274,7 @@
      * @return {GConfig}          Fluid interface.
      */
     GConfig.prototype.set = function(key, value, namespace){
-        //TODO: Make bindable.
-        this.log('Adding: %s::%s under %s.', key, value, namespace);
+        this.logger.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
@@ -294,9 +324,20 @@
     /**
      * Simple log implementation.
      */
-    GConfig.prototype.log = function(){
-        if('debug' in this && this.debug === false) return;
-        console.log.apply(console, arguments);
+    GConfig.prototype.logger = console || _shimConsole();
+
+    /**
+     * TODO: We should do this at a global scope? Meaning before
+     *       We create the instance?! Hoe we do this
+     * Resource loader manager
+     * @param {String} id     ID of resource loader.
+     * @param {Function} loader Resource loader.
+     */
+    GConfig.prototype.addResourceLoader = function(id, loader, index){
+        // this.loaders[id] = loader;
+        if(index !== undefined) this.loaders.splice(index, 0, loader);
+        else this.loaders.push(loader);
+        return this;
     };
 
     //This will eventually be deprecated!
