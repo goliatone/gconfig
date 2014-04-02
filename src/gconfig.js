@@ -133,8 +133,8 @@
         this.meta = document.getElementsByTagName('meta');
 
         this.namespaces = [];
-        this.options = options;
-        this.namespace = options.namespace;
+        this.options = config;
+        this.namespace = config.namespace;
 
         //TODO: Should we do methods instead of strings?
         !this.loaders && (this.loaders = []);
