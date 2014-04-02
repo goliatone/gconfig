@@ -116,9 +116,9 @@
         this.namespace = options.namespace;
 
         //TODO: Should we do methods instead of strings?
-        //this.loaders = ['loadMedatada'];
-        this.loaders = [this.loadMedatada.bind(this)];
-        this.loadMedatada.async = false;
+        !this.loaders && (this.loaders = []);
+
+        this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
 
         this.initialized = false;
 
@@ -127,9 +127,22 @@
 
     GConfig.defaults = options;
 
+
+    
+
 ///////////////////////////////////////////////////
-// PRIVATE METHODS
+// PUBLIC METHODS
 ///////////////////////////////////////////////////
+    
+    GConfig.prototype.init = function(config){
+        if(this.initialized) return;
+        this.initialized = true;
+
+        _extend(this, config);
+
+        this.getConfig( );
+        this.log('META: ', this.data);
+    };
 
     /**
      * Method that triggers data loaders.
@@ -184,17 +197,7 @@
         /*setTimeout((function(){
             this.emit('ondata');
         }).bind(this), 0);*/
-    };
-
-    GConfig.prototype.init = function(config){
-        if(this.initialized) return;
-        this.initialized = true;
-
-        _extend(this, config);
-
-        this.getConfig( );
-        this.log('META: ', this.data);
-    };
+    };   
 
     /**
      * Extends GConfig's prototype. Use it to add
@@ -206,8 +209,6 @@
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext){
-
-
         if(typeof ext === 'function') ext(GConfig);
         else if('register' in ext &&
             typeof ext.register === 'function') ext.register(GConfig);
@@ -309,6 +310,20 @@
     GConfig.prototype.log = function(){
         if('debug' in this && this.debug === false) return;
         console.log.apply(console, arguments);
+    };
+
+    /**
+     * TODO: We should do this at a global scope? Meaning before
+     *       We create the instance?! Hoe we do this
+     * Resource loader manager
+     * @param {String} id     ID of resource loader.
+     * @param {Function} loader Resource loader.
+     */
+    GConfig.prototype.addResourceLoader = function(id, loader, index){
+        // this.loaders[id] = loader;
+        if(index !== undefined) this.loaders.splice(index, 0, loader);
+        else this.loaders.push(loader);
+        return this;
     };
 
     //This will eventually be deprecated!
