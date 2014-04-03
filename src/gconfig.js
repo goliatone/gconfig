@@ -43,20 +43,17 @@
      * @return {Object}        Resulting object from
      *                         meging target to params.
      */
-    var _extend = function(target) {
-        var i = 1, length = arguments.length, source;
-        for ( ; i < length; i++ ) {
-            // Only deal with defined values
-            if ((source = arguments[i]) != undefined ){
-                Object.getOwnPropertyNames(source).forEach(function(k){
-                    var d = Object.getOwnPropertyDescriptor(source, k) || {value:source[k]};
-                    if (d.get) {
-                        target.__defineGetter__(k, d.get);
-                        if (d.set) target.__defineSetter__(k, d.set);
-                    } else if (target !== d.value) target[k] = d.value;
-                });
+    var _extend = function extend(target) {
+        var sources = [].slice.call(arguments, 1);
+        sources.forEach(function (source) {
+            for (var property in source) {
+                if(source[property] && source[property].constructor &&
+                    source[property].constructor === Object){
+                    target[property] = target[property] || {};
+                    target[property] = extend(target[property], source[property]);
+                } else target[property] = source[property];
             }
-        }
+        });
         return target;
     };
 
@@ -112,7 +109,7 @@
 ///////////////////////////////////////////////////
 // CONSTRUCTOR
 ///////////////////////////////////////////////////
-    
+
     var _OPTIONS = {
         selector:'meta[name^="::NAMESPACE::-"]',
         namespace:'app'
@@ -139,8 +136,6 @@
         //TODO: Should we do methods instead of strings?
         !this.loaders && (this.loaders = []);
 
-        this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
-
         this.initialized = false;
 
         this.init(config);
@@ -151,12 +146,15 @@
 ///////////////////////////////////////////////////
 // PUBLIC METHODS
 ///////////////////////////////////////////////////
-    
+
     GConfig.prototype.init = function(config){
         if(this.initialized) return;
         this.initialized = true;
+
         config  = config || {};
         _extend(this, config);
+
+        this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
 
         this.getConfig( );
         this.logger.log('META: ', this.data);
@@ -175,7 +173,7 @@
         var onLoadersDone = function(){
             this.onConfigLoaded();
         }.bind(this);
-        
+
         _map(this.loaders, onLoadersDone, this);
     };
 
@@ -215,7 +213,7 @@
         /*setTimeout((function(){
             this.emit('ondata');
         }).bind(this), 0);*/
-    };   
+    };
 
     /**
      * Extends GConfig's prototype. Use it to add
@@ -262,7 +260,7 @@
      * @return {GConfig}          Fluid interface.
      */
     GConfig.prototype.merge = function(object, namespace){
-        _extend(this.getNamespace(namespace), object);
+        _extend(this.getNamespace(namespace, this.data), object);
         return this;
     };
 
@@ -274,7 +272,6 @@
      * @return {GConfig}          Fluid interface.
      */
     GConfig.prototype.set = function(key, value, namespace){
-        this.logger.log('Adding: %s::%s under %s.', key, value, namespace);
         namespace || (namespace = this.namespace);
         if(!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
@@ -316,7 +313,7 @@
             return {};
         }
 
-        if(clone) return _extend({}, this.data[namespace]);
+        if(clone === true) return _extend({}, this.data[namespace]);
 
         return this.data[namespace];
     };
