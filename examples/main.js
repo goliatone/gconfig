@@ -10,7 +10,23 @@ requirejs.config({
 
 define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
     console.log('Loading');
-	var config = new GConfig();
+
+    var jsonLoader = function(gconfig){
+        var done = this.async();
+        $.ajax({
+            url:"config.json"
+        }).done(function(data){
+            window.cjson = data;
+            gconfig.merge(data, true);
+            done();
+        }).fail(function(){
+            done();
+        });
+    };
+
+	var config = new GConfig({
+        loaders:[jsonLoader]
+    });
 
     config.use(GCPPath);
 
@@ -31,33 +47,33 @@ define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
 	var config2 = new GConfig();
 	config2.set('config2', 'just-addeed');
 
-	config.log(config.get('name'));
-	config.log(config.get('baseurl'));
-	config.log(config.get('default-controller'));
+	config.logger.log(config.get('name'));
+	config.logger.log(config.get('baseurl'));
+	config.logger.log(config.get('default-controller'));
 
 	var widget  = {'template':'widget-template'};
 	var service = {'serviceUrl':'http://api.example.com/v1/'};
 	console.log('-----');
-	config.log('cf ', config.data);
-	config.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
-	config.merge(service);
+	config.logger.log('cf ', config.data);
+	config.logger.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
+	config.merge(service, 'app');
 	config.merge(widget, 'widget');
-	config.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
-	config.log('widget template ', config.get('template', 'note-set', 'widget'));
-	config.log('cf ', config.data);
+	config.logger.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
+	config.logger.log('widget template ', config.get('template', 'note-set', 'widget'));
+	config.logger.log('cf ', config.data);
 	console.log('-----');
-	config.log('cf2 ', config2.data);
+
+	config.logger.log('cf2 ', config2.data);
 	console.log('-----');
 
 	var vo = {};
 	config.configure(vo);
-	config.log('Configured: %o', vo);
-	config.log('Namespace: %o', config.configure({}, 'widget'));
-
+	config.logger.log('Configured: %o', vo);
+	config.logger.log('Namespace: %o', config.configure({}, 'widget'));
 
     console.log('------------');
     config.set('app.path', 'some-path');
-    config.log(config.resolve('app.path'));
+    config.logger.log(config.resolve('app.path'));
 
 	window.config = config;
 });
