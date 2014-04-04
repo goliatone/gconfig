@@ -17,7 +17,16 @@ define(function (require) {
 
     console.log('Loading', require('jquery'));
 
-
+    /**
+     * Example of a configuration loader.
+     * The method get executed in an object that
+     * has an `async` method, when called we get a
+     * callback as return. That callback is the next
+     * step in the queue.
+     *
+     * @param  {GConfig} gconfig GConfig instance
+     * @return {void}
+     */
     var jsonLoader = function(gconfig){
         var done = this.async();
         $.ajax({
@@ -38,8 +47,12 @@ define(function (require) {
         loaders:[jsonLoader]
     });
 
-    window.config = config;
-
+    /**
+     * This is a rather silly implementation to showcase
+     * the use method.
+     * From the console, type:
+     * `$('head').append('<meta name="pepe:rone" content="OYEAH">');`
+     */
 	config.use({'watch':function(){
 		//To make this cross browser safe, for IE < 8 we should
 		//check if appendChild is function. Else, poll
@@ -47,7 +60,7 @@ define(function (require) {
         var __appendChild = head.appendChild;
         var self = this;
         head.appendChild = function(){
-            self.generateMeta();
+            self.loadMedatada();
             __appendChild.apply(head, arguments);
         };
 	}});
@@ -86,5 +99,8 @@ define(function (require) {
     config.set('app.path', 'some-path');
     config.logger.log(config.resolve('app.path'));
 
-
+/***********************************
+|  DEBUG: Make config available    |
+***********************************/
+    window.config = config;
 });
