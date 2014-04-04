@@ -35,8 +35,6 @@
     }
 }(this, 'GConfig', function() {
 
-
-
     /**
      * Extend method.
      * @param  {Object} target Source object
@@ -183,12 +181,6 @@
         config = _extend({}, GConfig.defaults || _OPTIONS, config);
         _extend(this, config);
 
-        GConfig.CONF_LOADERS.forEach(function(element, index, array){
-            if(!this[element]) return;
-            this.addResourceLoader(element, this[element].bind(this), index);
-        }, this);
-
-
         this.getConfig( );
         this.logger.log('META: ', this.data);
     };
@@ -201,18 +193,23 @@
      */
     GConfig.prototype.getConfig = function( )
     {
-        //TODO: We should provide a next to each loader
-        //to step forward on the chain.
-        var onLoadersDone = function(){
-            this.onConfigLoaded();
-        }.bind(this);
+        /*
+         * Append all loaders to our instance. This we assigned
+         * globally using `GCongfig.CONF_LOADERS`.
+         */
+        GConfig.CONF_LOADERS.forEach(function(element, index, array){
+            if(!this[element]) return;
+            this.addResourceLoader(element, this[element].bind(this), index);
+        }, this);
 
-        _map(this.loaders, onLoadersDone, this);
+        //Iterate over loaders, and execute each. It could be async.
+        _map(this.loaders, this.onConfigLoaded.bind(this), this);
     };
 
     /**
-     * TODO: Return promise or emit on done.
-     * Method to update the meta object, from the meta NodeList
+     * Default resource loader.
+     * Pulls data from DOMs `meta` tags.
+     *
      */
     GConfig.prototype.loadMedatada = function( )
     {
@@ -224,7 +221,6 @@
         for( var i = 0, l = meta.length; i < l; i++ )
         {
             key = meta[i].name || meta[i].getAttribute('property');
-            // this.log('meta name: %s :: %s ', key, meta[i].content);
 
             //no key?
             if(!key) continue;
@@ -236,16 +232,16 @@
             key = key.split(':')[1];
             val = meta[i].content;
 
-            //trigger callback
-            // addMetaCallback(key, val, nsp);
             this.set(key, val, nsp);
         }
     };
 
     GConfig.prototype.onConfigLoaded = function(){
-        /*setTimeout((function(){
+        //Schedule for next tick.
+        setTimeout((function(){
             this.emit('ondata');
-        }).bind(this), 0);*/
+            console.warn('ON DATA!!');
+        }).bind(this), 0);
     };
 
     /**
