@@ -4,12 +4,19 @@ requirejs.config({
     paths: {
         'jquery': 'jquery/jquery',
         'gconfig': 'gconfig',
-        'gconfig.path' :'gconfig.path'
+        'gconfig.path' :'gconfig.path',
+        'gconfig.qstring' :'gconfig.qstring'
     }
 });
 
-define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
-    console.log('Loading');
+define(function (require) {
+    var GConfig = require('gconfig'),
+        GCPPath = require('gconfig.path'),
+        GConfigQS = require('gconfig.qstring'),
+        $ = require('jquery');
+
+    console.log('Loading', require('jquery'));
+
 
     var jsonLoader = function(gconfig){
         var done = this.async();
@@ -24,11 +31,14 @@ define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
         });
     };
 
+    GConfig.extend(GCPPath);
+    GConfig.extend(GConfigQS);
+
 	var config = new GConfig({
         loaders:[jsonLoader]
     });
 
-    config.use(GCPPath);
+    window.config = config;
 
 	config.use({'watch':function(){
 		//To make this cross browser safe, for IE < 8 we should
@@ -45,6 +55,7 @@ define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
 	config.watch();
 
 	var config2 = new GConfig();
+    window.config2 = config2;
 	config2.set('config2', 'just-addeed');
 
 	config.logger.log(config.get('name'));
@@ -75,5 +86,5 @@ define(['gconfig', 'gconfig.path', 'jquery'], function (GConfig, GCPPath, $) {
     config.set('app.path', 'some-path');
     config.logger.log(config.resolve('app.path'));
 
-	window.config = config;
+
 });

@@ -53,6 +53,10 @@ Async forEach:
 http://stackoverflow.com/questions/17860089/array-and-asynchronous-function-callback
 http://zef.me/3420/async-foreach-in-javascript
 
+## PLUGINS:
+- Plugins should have an option to autoregister on load.
+- Plugins should be attached before we create any instances.
+- We should be able to test plugins
 
 ## TESTING
 How do we test plugins? We should test the plugin code, but also make sure that when attached they do not break `GConfig` tests.

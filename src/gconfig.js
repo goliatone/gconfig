@@ -57,7 +57,20 @@
         return target;
     };
 
-    var _map = function(arr, done) {
+    /**
+     * Plug in implementation.
+     * @param  {Function|Object} ext Plug in object.
+     * @param  {Function|Object} src
+     * @return {void}
+     */
+    var _using = function(ext, src){
+        if(typeof ext === 'function') ext(src);
+        else if('register' in ext &&
+            typeof ext.register === 'function') ext.register(src);
+        else if(typeof ext === 'object') _extend(src, ext);
+    };
+
+    var _map = function(arr, done /*, ...rest*/) {
         var i    = -1,
             len  = arr.length,
             args = Array.prototype.slice.call(arguments, 2);
@@ -134,15 +147,31 @@
         this.namespace = config.namespace;
 
         //TODO: Should we do methods instead of strings?
-        !this.loaders && (this.loaders = []);
+        this.loaders = this.loaders || [];
 
         this.initialized = false;
 
         this.init(config);
     };
 
+    /**
+     * GConfig default config object.
+     */
     GConfig.defaults = _OPTIONS;
 
+    /**
+     * GConfig configuration loaders.
+     */
+    GConfig.CONF_LOADERS = ['loadMedatada'];
+
+    /**
+     * GConfig extend method.
+     * @param  {Object|Function} ext
+     * @return {void}
+     */
+    GConfig.extend = function(ext){
+        _using(ext, GConfig);
+    };
 ///////////////////////////////////////////////////
 // PUBLIC METHODS
 ///////////////////////////////////////////////////
@@ -151,10 +180,14 @@
         if(this.initialized) return;
         this.initialized = true;
 
-        config  = config || {};
+        config = _extend({}, GConfig.defaults || _OPTIONS, config);
         _extend(this, config);
 
-        this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
+        GConfig.CONF_LOADERS.forEach(function(element, index, array){
+            if(!this[element]) return;
+            this.addResourceLoader(element, this[element].bind(this), index);
+        }, this);
+
 
         this.getConfig( );
         this.logger.log('META: ', this.data);
@@ -216,6 +249,9 @@
     };
 
     /**
+     * TODO: Review plugin procedure. We want to pass
+     *       GConfig to plugin to extend and initialize.
+     *
      * Extends GConfig's prototype. Use it to add
      * functionality or to override methods. The
      * idea is to support a plugin architecture.
@@ -225,11 +261,7 @@
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext){
-        if(typeof ext === 'function') ext(GConfig);
-        else if('register' in ext &&
-            typeof ext.register === 'function') ext.register(GConfig);
-        else if(typeof ext === 'object') _extend(GConfig.prototype, ext);
-
+        _using(ext, this);
         return this;
     };
 
@@ -322,6 +354,13 @@
      * Simple log implementation.
      */
     GConfig.prototype.logger = console || _shimConsole();
+
+    /**
+     * Stub emit function. User must extend
+     * and implement to get events.
+     */
+    GConfig.prototype.emit = function(){};
+
 
     /**
      * TODO: We should do this at a global scope? Meaning before
