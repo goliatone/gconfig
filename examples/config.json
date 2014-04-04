@@ -1,0 +1,7 @@
+{
+    "remote":{
+        "loader":"jsonLoader",
+        "type":"async",
+        "lorem": [1,2,3,4]
+    }
+}
