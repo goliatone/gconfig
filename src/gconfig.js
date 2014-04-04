@@ -134,7 +134,7 @@
         this.namespace = config.namespace;
 
         //TODO: Should we do methods instead of strings?
-        !this.loaders && (this.loaders = []);
+        this.loaders = this.loaders || [];
 
         this.initialized = false;
 
@@ -142,7 +142,7 @@
     };
 
     GConfig.defaults = _OPTIONS;
-
+    // GConfig.CONF_LOADERS = ['loadMedatada'];
 ///////////////////////////////////////////////////
 // PUBLIC METHODS
 ///////////////////////////////////////////////////
@@ -151,7 +151,7 @@
         if(this.initialized) return;
         this.initialized = true;
 
-        config  = config || {};
+        config = _extend({}, GConfig.defaults || _OPTIONS, config);
         _extend(this, config);
 
         this.addResourceLoader('metadata', this.loadMedatada.bind(this), 0);
@@ -216,9 +216,9 @@
     };
 
     /**
-     * TODO: Review plugin procedure. We want to pass 
+     * TODO: Review plugin procedure. We want to pass
      *       GConfig to plugin to extend and initialize.
-     * 
+     *
      * Extends GConfig's prototype. Use it to add
      * functionality or to override methods. The
      * idea is to support a plugin architecture.
@@ -325,6 +325,13 @@
      * Simple log implementation.
      */
     GConfig.prototype.logger = console || _shimConsole();
+
+    /**
+     * Stub emit function. User must extend
+     * and implement to get events.
+     */
+    GConfig.prototype.emit = function(){};
+
 
     /**
      * TODO: We should do this at a global scope? Meaning before
