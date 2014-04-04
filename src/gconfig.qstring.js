@@ -267,22 +267,40 @@
     var GConfigQS = {};
 
     GConfigQS.register = function(GConfig){
+
+        /**
+         * Register `loadQueryString` loader.
+         */
         GConfig.CONF_LOADERS.push('loadQueryString');
 
+        /**
+         * Configuration object to query string.
+         * @return {String}
+         */
         GConfig.prototype.toQueryString = function(){
             return QueryString.stringify(this.data);
         };
 
-        GConfig.prototype.loadQueryString = function(queryString){
-            var qs = QueryString.parse(queryString);
+        /**
+         * Load query string into our main data object.
+         * @return {void}
+         */
+        GConfig.prototype.loadQueryString = function(){
+            var search = window.location.search,
+                qs = QueryString.parse(search);
             qs = this.filterAttributes(qs);
-            this.merge(qs);
+            this.merge(qs, true);
         };
 
+        /**
+         * Convenience method to filter query string.
+         * @param  {Object} data Query string object.
+         * @return {Object}      Filtered object.
+         */
         GConfig.prototype.filterAttributes = function(data){
             return data;
         };
     };
-    window.QueryString = QueryString;
+
     return GConfigQS;
 }));
