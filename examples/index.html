@@ -16,17 +16,90 @@
         <meta name="sidebar:controller" content="SidebarController">
         <meta name="widget:id" content="widgetId">
         <!--//GConfig metadata -->
+        <link rel="stylesheet" href="css/foundation.css" />
 
         <title>Config Sample</title>
 
         <!--[if lt IE 9]> HTML5Shiv
             <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
-
+        <style type="text/css">
+            button{
+                display: block!important;
+            }
+        </style>
     </head>
     <body>
-        <h1>GConfig test file</h1>
-        <p>We have some testing stuff here.</p>
+        <div class="wrapper">
+        <div class="row">
+            <div class="large-12 columns">
+                <h2>GConfig test file <small>We have some testing stuff here.</small></h2>
+                <hr />
+            </div>
+        </div>
+        <!-- End Nav -->
+        <!-- Main Page Content and Sidebar -->
+        <div class="row">
+            <!-- Main Content -->
+            <div class="large-12 columns console" role="content">
+                <h4><a href="#">Output</a></h4>
+                <article id="consoleLog" class="console-output">
+                    <span></span>
+                </article>
+                <br/>
+                <button id="clearLogBut" class="button expand tiny radius" >Clear log</button>
+            </div>
+        </div>
+        <br/>
+
+        <!-- sheepIt Form -->
+        <div id="sheepItForm" class="row">
+            <div class="large-12 columns">
+                <!-- Form template-->
+                <div id="sheepItForm_template" class="row collapse">
+                    <div class="small-3 large-2 columns">
+                        <span class="prefix"  id="sheepItForm_label"></span>
+                    </div>
+                     <div class="small-7 large-8 columns">
+                        <input id="sheepItForm_#index#_phone" id="wsUri" type="text" placeholder="Enter your URL..." name="person[phones][#index#][phone]">
+                    </div>
+
+                     <!-- <div class="small-2 columns">
+                        <a id="sheepItForm_remove_current" class="button postfix">
+                            <img class="delete" src="images/cross.png" width="16" height="16" border="0">
+                        </a>
+                    </div> -->
+
+                    <div class="small-2 columns">
+                        <a href="#" class="button postfix remove_current">Connect</a>
+                    </div>
+
+                </div>
+
+
+                <!-- /Form template-->
+                <!-- No forms template -->
+                <div id="sheepItForm_noforms_template">No phones</div>
+                <!-- /No forms template-->
+
+                <!-- Controls -->
+                <div id="sheepItForm_controls">
+                    <ul class="button-group">
+                      <li id="sheepItForm_add"><a href="#" class="button">Add phone</a></li>
+                      <li id="sheepItForm_remove_last"><a href="#" class="button alert">Remove</a></li>
+                      <li id="sheepItForm_remove_all"><a href="#" class="button alert">Remove all</a></li>
+                    </ul>
+                </div>
+                <!-- /Controls -->
+            </div>
+        </div>
+        <!-- /sheepIt Form -->
+
+        <!-- End Main Content and Sidebar -->
+    </div> <!--@END Wrapper -->
+
+
+
     </body>
     <script src="requirejs/require.js" data-main="main"></script>
 </html>

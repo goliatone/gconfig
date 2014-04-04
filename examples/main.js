@@ -5,7 +5,11 @@ requirejs.config({
         'jquery': 'jquery/jquery',
         'gconfig': 'gconfig',
         'gconfig.path' :'gconfig.path',
-        'gconfig.qstring' :'gconfig.qstring'
+        'gconfig.qstring' :'gconfig.qstring',
+        'jqsheepit' :'vendors/jquery.sheepit'
+    },
+    shim:{
+        'jqsheepit': ["jquery"]
     }
 });
 
@@ -13,7 +17,8 @@ define(function (require) {
     var GConfig = require('gconfig'),
         GCPPath = require('gconfig.path'),
         GConfigQS = require('gconfig.qstring'),
-        $ = require('jquery');
+        $ = require('jquery'),
+        pgl = require('jqsheepit');
 
     console.log('Loading', require('jquery'));
 
@@ -103,4 +108,31 @@ define(function (require) {
 |  DEBUG: Make config available    |
 ***********************************/
     window.config = config;
+
+
+    var sheepItForm = $('#sheepItForm').sheepIt({
+        separator: '',
+        allowRemoveLast: true,
+        allowRemoveCurrent: true,
+        allowRemoveAll: true,
+        allowAdd: true,
+        allowAddN: true,
+        maxFormsCount: 10,
+        minFormsCount: 0,
+        iniFormsCount: 2,
+        removeCurrentSelector: '.remove_current',
+        data: [
+            {
+                'sheepItForm_#index#_phone': '364-3456-746'
+            },
+            {
+                // #form#_#index# will be replaced by sheepItForm_1 (In this case)
+                '#form#_#index#_phone': '64-56775-4545'
+            },
+            {
+                // If you respect the pattern, you can pass only phone and other information will be deduced
+                'phone': '76-57775-4665'
+            }
+        ]
+    });
 });
