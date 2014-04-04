@@ -31,17 +31,14 @@ define(function (require) {
         });
     };
 
-    GConfig.extend(GConfigQS);
     GConfig.extend(GCPPath);
+    GConfig.extend(GConfigQS);
 
 	var config = new GConfig({
         loaders:[jsonLoader]
     });
 
     window.config = config;
-
-
-
 
 	config.use({'watch':function(){
 		//To make this cross browser safe, for IE < 8 we should
