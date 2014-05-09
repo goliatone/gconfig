@@ -168,12 +168,43 @@
     GConfig.CONF_LOADERS = ['loadMedatada'];
 
     /**
+     * Module loader, defaults
+     * to `require`
+     * @type {Function}
+     */
+    GConfig.loader = require;
+
+    /**
+     * Require plugins and register on
+     * load. Asynchronous
+     * @augments {arguments} List of plugin names.
+     * @return {void}
+     */
+    GConfig.require = function() {
+        var plugins = [].slice.call(arguments);
+        console.log('REQUIRE', plugins);
+        this.loader(plugins, function() {
+            console.log('REQUIRE DONE', arguments);
+            var plugins = [].slice.call(arguments);
+            plugins.forEach(function(plugin) {
+                console.log('register', plugin);
+                plugin.register(GConfig);
+            });
+        });
+    };
+
+    /**
      * GConfig extend method.
      * @param  {Object|Function} ext
      * @return {void}
      */
-    GConfig.extend = function(ext) {
-        _using(ext, GConfig);
+    GConfig.extend = function() {
+        var plugins = [].slice.call(arguments);
+        plugins.forEach(function(plugin) {
+            _using(plugin, this);
+        }, this);
+        // _using(ext, GConfig);
+        return this;
     };
     ///////////////////////////////////////////////////
     // PUBLIC METHODS
@@ -261,7 +292,10 @@
      * @return {GConfig}    Fluid interface.
      */
     GConfig.prototype.use = function(ext) {
-        _using(ext, this);
+        var plugins = [].slice.call(arguments);
+        plugins.forEach(function(plugin) {
+            _using(plugin, this);
+        }, this);
         return this;
     };
 
