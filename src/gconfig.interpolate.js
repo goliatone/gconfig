@@ -49,7 +49,7 @@
      */
     var _resolvePropertyChain = function(target, path, defaultValue) {
         if (typeof path === 'string') path = path.split('.');
-        console.warn('path', path, target)
+        // console.warn('path', path, target);
         var l = path.length,
             i = 0,
             p = '';
@@ -67,14 +67,18 @@
         function replaceFn() {
             var prop = arguments[1];
             prop = prop.replace(/\\/g, '');
-            console.log('PROP', prop.replace(/\\/g, ''), context)
+            // console.log('PROP', prop.replace(/\\/g, ''), context);
 
             return _resolvePropertyChain(context, prop)
         }
         otag = otag || '@{';
         ctag = ctag || '}';
-        console.warn('template', otag + '(\\w+)' + ctag)
+        // console.warn('template', otag + '(\\w+)' + ctag);
         return template.replace(/@{([^}\r\n]*)}/g, replaceFn);
+    };
+
+    var _needsInterpolation = function(key) {
+        return !!key.match(/@{([^}\r\n]*)}/g);
     };
 
     ///////////////////////////////////////////////////
@@ -91,10 +95,34 @@
     GCInterpolate.register = function(GConfig) {
         var _get = GConfig.prototype.get;
 
+        GConfig.prototype.get = function(key, devaultValue, namespace) {
+            var value = _get.call(this, key, devaultValue, namespace);
+            if (!_needsInterpolation(value)) return value;
+            return _compiled(value, this.data, this.get);
+        };
+
         GConfig.prototype.interpolate = function(key, defaultValue, namespace) {
             var value = this.get(key, defaultValue, namespace);
-            console.log('interpolate', value)
+            // console.log('interpolate', value);
             return _compiled(value, this.data, this.get);
+        };
+
+        GConfig.prototype.solveDependencies = function() {
+
+            var solve = function solve(data, namespace, self) {
+                var value;
+                Object.keys(data).forEach(function(key) {
+                    if (typeof data[key] === 'string') {
+                        value = self.get(key, data[key], namespace);
+                        // console.info('key', key, namespace, data[key]);
+                        self.set(key, value, namespace);
+                    } else {
+                        // console.warn('key', key);
+                        solve(data[key], key, self);
+                    }
+                });
+            };
+            solve(this.data, this.namespace, this);
         };
     };
 
