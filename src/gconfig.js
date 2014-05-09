@@ -8,10 +8,10 @@
  */
 /* jshint strict: false, plusplus: true */
 /*global define: false, require: false, module: false, exports: false */
-(function (root, name, deps, factory) {
+(function(root, name, deps, factory) {
 
     // Node
-    if(typeof deps === 'function') {
+    if (typeof deps === 'function') {
         factory = deps;
         deps = [];
     }
@@ -24,11 +24,14 @@
         define(name.toLowerCase(), deps, factory);
     } else {
         // Browser
-        var d, i = 0, global = root, old = global[name], mod;
-        while((d = deps[i]) !== undefined) deps[i++] = root[d];
+        var d, i = 0,
+            global = root,
+            old = global[name],
+            mod;
+        while ((d = deps[i]) !== undefined) deps[i++] = root[d];
         global[name] = mod = factory.apply(global, deps);
         //Export no 'conflict module', aliases the module.
-        mod.noConflict = function(){
+        mod.noConflict = function() {
             global[name] = old;
             return mod;
         };
@@ -43,10 +46,10 @@
      */
     var _extend = function extend(target) {
         var sources = [].slice.call(arguments, 1);
-        sources.forEach(function (source) {
+        sources.forEach(function(source) {
             for (var property in source) {
-                if(source[property] && source[property].constructor &&
-                    source[property].constructor === Object){
+                if (source[property] && source[property].constructor &&
+                    source[property].constructor === Object) {
                     target[property] = target[property] || {};
                     target[property] = extend(target[property], source[property]);
                 } else target[property] = source[property];
@@ -61,26 +64,28 @@
      * @param  {Function|Object} src
      * @return {void}
      */
-    var _using = function(ext, src){
-        if(typeof ext === 'function') ext(src);
-        else if('register' in ext &&
+    var _using = function(ext, src) {
+        if (typeof ext === 'function') ext(src);
+        else if ('register' in ext &&
             typeof ext.register === 'function') ext.register(src);
-        else if(typeof ext === 'object') _extend(src, ext);
+        else if (typeof ext === 'object') _extend(src, ext);
     };
 
-    var _map = function(arr, done /*, ...rest*/) {
-        var i    = -1,
-            len  = arr.length,
+    var _map = function(arr, done /*, ...rest*/ ) {
+        var i = -1,
+            len = arr.length,
             args = Array.prototype.slice.call(arguments, 2);
         (function next(result) {
             var each,
                 async,
                 abort = (typeof result === 'boolean');
 
-            do{ ++i; } while (!(i in arr) && i !== len);
+            do {
+                ++i;
+            } while (!(i in arr) && i !== len);
 
             if (abort || i === len) {
-                if(done) return done(result);
+                if (done) return done(result);
             }
 
             each = arr[i];
@@ -100,30 +105,30 @@
      * available calls do not generate errors.
      * @return {Object} Console shim.
      */
-    var _shimConsole = function(){
+    var _shimConsole = function() {
         var empty = {},
-            con   = {},
-            noop  = function() {},
+            con = {},
+            noop = function() {},
             properties = 'memory'.split(','),
             methods = ('assert,clear,count,debug,dir,dirxml,error,exception,group,' +
-                       'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
-                       'table,time,timeEnd,timeStamp,trace,warn').split(','),
+                'groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,' +
+                'table,time,timeEnd,timeStamp,trace,warn').split(','),
             prop,
             method;
 
-        while (method = methods.pop())    con[method] = noop;
-        while (prop   = properties.pop()) con[prop]   = empty;
+        while (method = methods.pop()) con[method] = noop;
+        while (prop = properties.pop()) con[prop] = empty;
 
         return con;
     };
 
-///////////////////////////////////////////////////
-// CONSTRUCTOR
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    // CONSTRUCTOR
+    ///////////////////////////////////////////////////
 
     var _OPTIONS = {
-        selector:'meta[name^="::NAMESPACE::-"]',
-        namespace:'app'
+        selector: 'meta[name^="::NAMESPACE::-"]',
+        namespace: 'app'
     };
 
     /**
@@ -131,9 +136,9 @@
      *
      * @param  {object} config Configuration object.
      */
-    var GConfig = function(config){
+    var GConfig = function(config) {
 
-        config  = config || {};
+        config = config || {};
 
         config = _extend({}, GConfig.defaults || _OPTIONS, config);
 
@@ -167,21 +172,21 @@
      * @param  {Object|Function} ext
      * @return {void}
      */
-    GConfig.extend = function(ext){
+    GConfig.extend = function(ext) {
         _using(ext, GConfig);
     };
-///////////////////////////////////////////////////
-// PUBLIC METHODS
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    // PUBLIC METHODS
+    ///////////////////////////////////////////////////
 
-    GConfig.prototype.init = function(config){
-        if(this.initialized) return;
+    GConfig.prototype.init = function(config) {
+        if (this.initialized) return;
         this.initialized = true;
 
         config = _extend({}, GConfig.defaults || _OPTIONS, config);
         _extend(this, config);
 
-        this.getConfig( );
+        this.getConfig();
         this.logger.log('META: ', this.data);
     };
 
@@ -191,14 +196,13 @@
      * synchronous loader.
      * @return {GConfig}    Fluid interface.
      */
-    GConfig.prototype.getConfig = function( )
-    {
+    GConfig.prototype.getConfig = function() {
         /*
          * Append all loaders to our instance. This we assigned
          * globally using `GCongfig.CONF_LOADERS`.
          */
-        GConfig.CONF_LOADERS.forEach(function(element, index, array){
-            if(!this[element]) return;
+        GConfig.CONF_LOADERS.forEach(function(element, index, array) {
+            if (!this[element]) return;
             this.addResourceLoader(element, this[element].bind(this), index);
         }, this);
 
@@ -211,22 +215,22 @@
      * Pulls data from DOMs `meta` tags.
      *
      */
-    GConfig.prototype.loadMedatada = function( )
-    {
-        var key = null, val = null, nsp = null;
+    GConfig.prototype.loadMedatada = function() {
+        var key = null,
+            val = null,
+            nsp = null;
 
         var meta = this.meta || (this.meta = document.getElementsByTagName('meta'));
 
         // search desired tag
-        for( var i = 0, l = meta.length; i < l; i++ )
-        {
+        for (var i = 0, l = meta.length; i < l; i++) {
             key = meta[i].name || meta[i].getAttribute('property');
 
             //no key?
-            if(!key) continue;
+            if (!key) continue;
 
             //we have a regular meta, skip
-            if( key.indexOf(':') === -1 ) continue;
+            if (key.indexOf(':') === -1) continue;
 
             nsp = key.split(':')[0];
             key = key.split(':')[1];
@@ -236,9 +240,9 @@
         }
     };
 
-    GConfig.prototype.onConfigLoaded = function(){
+    GConfig.prototype.onConfigLoaded = function() {
         //Schedule for next tick.
-        setTimeout((function(){
+        setTimeout((function() {
             this.emit('ondata');
             console.warn('ON DATA!!');
         }).bind(this), 0);
@@ -256,7 +260,7 @@
      *                      GConfig's prototype
      * @return {GConfig}    Fluid interface.
      */
-    GConfig.prototype.use = function(ext){
+    GConfig.prototype.use = function(ext) {
         _using(ext, this);
         return this;
     };
@@ -274,7 +278,7 @@
      * @param  {String} namespace Namespace id
      * @return {GConfig}          Fluid interface.
      */
-    GConfig.prototype.configure = function(object, namespace){
+    GConfig.prototype.configure = function(object, namespace) {
         _extend(object, this.getNamespace(namespace));
         return this;
     };
@@ -287,7 +291,7 @@
      * @param  {String} namespace Namespace id.
      * @return {GConfig}          Fluid interface.
      */
-    GConfig.prototype.merge = function(object, namespace){
+    GConfig.prototype.merge = function(object, namespace) {
         _extend(this.getNamespace(namespace, this.data), object);
         return this;
     };
@@ -299,9 +303,9 @@
      * @param  {String} namespace Namespace id
      * @return {GConfig}          Fluid interface.
      */
-    GConfig.prototype.set = function(key, value, namespace){
+    GConfig.prototype.set = function(key, value, namespace) {
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.data)) this.data[namespace] = {};
+        if (!(namespace in this.data)) this.data[namespace] = {};
         this.data[namespace][key] = value;
         return this;
     };
@@ -314,9 +318,9 @@
      * @param  {String} namespace Namespace id
      * @return {Object}           Key value
      */
-    GConfig.prototype.get = function(key, defaultValue, namespace){
+    GConfig.prototype.get = function(key, defaultValue, namespace) {
         namespace || (namespace = this.namespace);
-        if(!(namespace in this.data) || !(key in this.data[namespace]))
+        if (!(namespace in this.data) || !(key in this.data[namespace]))
             return defaultValue;
         return this.data[namespace][key];
     };
@@ -333,15 +337,15 @@
      * @param  {Boolean} clone      Should we clone namespace
      * @return {Object}             Namespace object.
      */
-    GConfig.prototype.getNamespace = function(namespace, clone){
+    GConfig.prototype.getNamespace = function(namespace, clone) {
         namespace || (namespace = this.namespace);
 
-        if(!(namespace in this.data)){
-            if(typeof clone === 'object') return clone;
+        if (!(namespace in this.data)) {
+            if (typeof clone === 'object') return clone;
             return {};
         }
 
-        if(clone === true) return _extend({}, this.data[namespace]);
+        if (clone === true) return _extend({}, this.data[namespace]);
 
         return this.data[namespace];
     };
@@ -355,7 +359,7 @@
      * Stub emit function. User must extend
      * and implement to get events.
      */
-    GConfig.prototype.emit = function(){};
+    GConfig.prototype.emit = function() {};
 
 
     /**
@@ -365,9 +369,9 @@
      * @param {String} id     ID of resource loader.
      * @param {Function} loader Resource loader.
      */
-    GConfig.prototype.addResourceLoader = function(id, loader, index){
+    GConfig.prototype.addResourceLoader = function(id, loader, index) {
         // this.loaders[id] = loader;
-        if(index !== undefined) this.loaders.splice(index, 0, loader);
+        if (index !== undefined) this.loaders.splice(index, 0, loader);
         else this.loaders.push(loader);
         return this;
     };
