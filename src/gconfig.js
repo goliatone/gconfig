@@ -142,7 +142,7 @@
 
         config = _extend({}, GConfig.defaults || _OPTIONS, config);
 
-        this.data = {};
+        this.data = config.data || {};
         this.meta = document.getElementsByTagName('meta');
 
         this.namespaces = [];
