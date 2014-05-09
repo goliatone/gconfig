@@ -19,6 +19,8 @@ define(function(require) {
 
     console.log('Loading', require('jquery'));
 
+
+
     /**
      * Example of a configuration loader.
      * The method get executed in an object that
@@ -32,7 +34,7 @@ define(function(require) {
     var jsonLoader = function(gconfig) {
         var done = this.async();
         $.ajax({
-            url: "config.json"
+            url: 'config.json'
         }).done(function(data) {
             window.cjson = data;
             gconfig.merge(data, true);
