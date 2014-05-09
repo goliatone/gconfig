@@ -191,6 +191,7 @@
                 plugin.register(GConfig);
             });
         });
+        return this;
     };
 
     /**
@@ -203,7 +204,6 @@
         plugins.forEach(function(plugin) {
             _using(plugin, this);
         }, this);
-        // _using(ext, GConfig);
         return this;
     };
     ///////////////////////////////////////////////////
