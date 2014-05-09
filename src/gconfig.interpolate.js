@@ -49,6 +49,7 @@
      */
     var _resolvePropertyChain = function(target, path, defaultValue) {
         if (typeof path === 'string') path = path.split('.');
+        console.warn('path', path, target)
         var l = path.length,
             i = 0,
             p = '';
@@ -69,34 +70,32 @@
      *
      * @param  {object} config Configuration object.
      */
-    var GCPPath = {};
+    var GCInterpolate = {};
+    var compiled = function(template, context, getter, otag, ctag) {
+        template = template.split('.').join('\\.');
 
-    GCPPath.register = function(GConfig) {
-        GConfig.prototype.resolve = function(path, defaultValue) {
-            return _resolvePropertyChain(this.data, path, defaultValue);
-        };
+        function replaceFn() {
+            var prop = arguments[1];
+            prop = prop.replace(/\\/g, '');
+            console.log('PROP', prop.replace(/\\/g, ''), context)
 
-        var _set = GConfig.prototype.set;
+            return _resolvePropertyChain(context, prop)
+        }
+        otag = otag || '@{';
+        ctag = ctag || '}';
+        console.warn('template', otag + '(\\w+)' + ctag)
+        return template.replace(/@{([^}\r\n]*)}/g, replaceFn);
+    };
+    GCInterpolate.register = function(GConfig) {
+        var _get = GConfig.prototype.get;
 
-        GConfig.prototype.set = function(key, value, namespace) {
-            if (!key) return this;
-            if (key.indexOf('.') === -1) return _set.call(this, key, value, namespace);
-            //
-            var keys = key.split('.'),
-                //Need to check for namespace, if it does not exist
-                target = namespace ? this.getNamespace(namespace) : this.data;
-
-            key = keys.pop();
-            keys.forEach(function(prop) {
-                if (!target[prop]) target[prop] = {};
-                target = target[prop];
-            });
-            target[key] = value;
-
-            return this;
+        GConfig.prototype.interpolate = function(key, defaultValue, namespace) {
+            var value = this.get(key, defaultValue, namespace);
+            console.log('interpolate', value)
+            return compiled(value, this.data, this.get);
         };
     };
 
 
-    return GCPPath;
+    return GCInterpolate;
 }));
