@@ -4,15 +4,17 @@ requirejs.config({
     paths: {
         'jquery': 'jquery/jquery',
         'gconfig': 'gconfig',
-        'gconfig.path' :'gconfig.path',
-        'gconfig.qstring' :'gconfig.qstring'
+        'gconfig.path': 'gconfig.path',
+        'gconfig.interpolate': 'gconfig.interpolate',
+        'gconfig.qstring': 'gconfig.qstring'
     }
 });
 
-define(function (require) {
+define(function(require) {
     var GConfig = require('gconfig'),
         GCPPath = require('gconfig.path'),
         GConfigQS = require('gconfig.qstring'),
+        GCInterpolate = require('gconfig.interpolate'),
         $ = require('jquery');
 
     console.log('Loading', require('jquery'));
@@ -27,24 +29,25 @@ define(function (require) {
      * @param  {GConfig} gconfig GConfig instance
      * @return {void}
      */
-    var jsonLoader = function(gconfig){
+    var jsonLoader = function(gconfig) {
         var done = this.async();
         $.ajax({
-            url:"config.json"
-        }).done(function(data){
+            url: "config.json"
+        }).done(function(data) {
             window.cjson = data;
             gconfig.merge(data, true);
             done();
-        }).fail(function(){
+        }).fail(function() {
             done();
         });
     };
 
     GConfig.extend(GCPPath);
     GConfig.extend(GConfigQS);
+    GConfig.extend(GCInterpolate);
 
-	var config = new GConfig({
-        loaders:[jsonLoader]
+    var config = new GConfig({
+        loaders: [jsonLoader]
     });
 
     /**
@@ -53,53 +56,59 @@ define(function (require) {
      * From the console, type:
      * `$('head').append('<meta name="pepe:rone" content="OYEAH">');`
      */
-	config.use({'watch':function(){
-		//To make this cross browser safe, for IE < 8 we should
-		//check if appendChild is function. Else, poll
-		var head = document.getElementsByTagName('head')[0];
-        var __appendChild = head.appendChild;
-        var self = this;
-        head.appendChild = function(){
-            self.loadMedatada();
-            __appendChild.apply(head, arguments);
-        };
-	}});
+    config.use({
+        'watch': function() {
+            //To make this cross browser safe, for IE < 8 we should
+            //check if appendChild is function. Else, poll
+            var head = document.getElementsByTagName('head')[0];
+            var __appendChild = head.appendChild;
+            var self = this;
+            head.appendChild = function() {
+                self.loadMedatada();
+                __appendChild.apply(head, arguments);
+            };
+        }
+    });
 
-	config.watch();
+    config.watch();
 
-	var config2 = new GConfig();
+    var config2 = new GConfig();
     window.config2 = config2;
-	config2.set('config2', 'just-addeed');
+    config2.set('config2', 'just-addeed');
 
-	config.logger.log(config.get('name'));
-	config.logger.log(config.get('baseurl'));
-	config.logger.log(config.get('default-controller'));
+    config.logger.log(config.get('name'));
+    config.logger.log(config.get('baseurl'));
+    config.logger.log(config.get('default-controller'));
 
-	var widget  = {'template':'widget-template'};
-	var service = {'serviceUrl':'http://api.example.com/v1/'};
-	console.log('-----');
-	config.logger.log('cf ', config.data);
-	config.logger.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
-	config.merge(service, 'app');
-	config.merge(widget, 'widget');
-	config.logger.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
-	config.logger.log('widget template ', config.get('template', 'note-set', 'widget'));
-	config.logger.log('cf ', config.data);
-	console.log('-----');
+    var widget = {
+        'template': 'widget-template'
+    };
+    var service = {
+        'serviceUrl': 'http://api.example.com/v1/'
+    };
+    console.log('-----');
+    config.logger.log('cf ', config.data);
+    config.logger.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
+    config.merge(service, 'app');
+    config.merge(widget, 'widget');
+    config.logger.log('serviceUrl ', config.get('serviceUrl', 'note-set'));
+    config.logger.log('widget template ', config.get('template', 'note-set', 'widget'));
+    config.logger.log('cf ', config.data);
+    console.log('-----');
 
-	config.logger.log('cf2 ', config2.data);
-	console.log('-----');
+    config.logger.log('cf2 ', config2.data);
+    console.log('-----');
 
-	var vo = {};
-	config.configure(vo);
-	config.logger.log('Configured: %o', vo);
-	config.logger.log('Namespace: %o', config.configure({}, 'widget'));
+    var vo = {};
+    config.configure(vo);
+    config.logger.log('Configured: %o', vo);
+    config.logger.log('Namespace: %o', config.configure({}, 'widget'));
 
     console.log('------------');
     config.set('app.path', 'some-path');
     config.logger.log(config.resolve('app.path'));
 
-/***********************************
+    /***********************************
 |  DEBUG: Make config available    |
 ***********************************/
     window.config = config;
