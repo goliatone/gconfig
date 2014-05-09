@@ -16,8 +16,8 @@ define(function(require) {
     var QString = require('gconfig.qstring'),
         Path = require('gconfig.path');
     GConfig.extend(QString, Path);
-    // GConfig.require('gconfig.path', 'gconfig.qstring');
-    console.log('Loading', require('jquery'));
+
+
 
     /**
      * Example of a configuration loader.
@@ -32,7 +32,7 @@ define(function(require) {
     var jsonLoader = function(gconfig) {
         var done = this.async();
         $.ajax({
-            url: "config.json"
+            url: 'config.json'
         }).done(function(data) {
             window.cjson = data;
             gconfig.merge(data, true);
