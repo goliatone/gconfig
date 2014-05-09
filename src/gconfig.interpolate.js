@@ -61,17 +61,7 @@
         return target;
     };
 
-    ///////////////////////////////////////////////////
-    // CONSTRUCTOR
-    ///////////////////////////////////////////////////
-
-    /**
-     * GCPPath constructor
-     *
-     * @param  {object} config Configuration object.
-     */
-    var GCInterpolate = {};
-    var compiled = function(template, context, getter, otag, ctag) {
+    var _compiled = function(template, context, getter, otag, ctag) {
         template = template.split('.').join('\\.');
 
         function replaceFn() {
@@ -86,16 +76,27 @@
         console.warn('template', otag + '(\\w+)' + ctag)
         return template.replace(/@{([^}\r\n]*)}/g, replaceFn);
     };
+
+    ///////////////////////////////////////////////////
+    // CONSTRUCTOR
+    ///////////////////////////////////////////////////
+
+    /**
+     * GCPPath constructor
+     *
+     * @param  {object} config Configuration object.
+     */
+    var GCInterpolate = {};
+
     GCInterpolate.register = function(GConfig) {
         var _get = GConfig.prototype.get;
 
         GConfig.prototype.interpolate = function(key, defaultValue, namespace) {
             var value = this.get(key, defaultValue, namespace);
             console.log('interpolate', value)
-            return compiled(value, this.data, this.get);
+            return _compiled(value, this.data, this.get);
         };
     };
-
 
     return GCInterpolate;
 }));
