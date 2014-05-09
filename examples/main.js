@@ -108,6 +108,9 @@ define(function(require) {
     config.set('app.path', 'some-path');
     config.logger.log(config.resolve('app.path'));
 
+    var url = config.interpolate('endpoint', 'http://localhost', 'api');
+    console.log('URL', url);
+
     /***********************************
 |  DEBUG: Make config available    |
 ***********************************/
