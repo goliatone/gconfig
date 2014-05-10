@@ -117,7 +117,20 @@
         GConfig.prototype.set = function(key, value, namespace) {
             if (!key) return this;
             if (key.indexOf('.') === -1) return _set.call(this, key, value, namespace);
-            if (!this.getNamespace(namespace, this.data)) throw new Error('FUCK IT')
+
+            /*
+             * If we have a namespace, ensure that is not also
+             * present in the key path.
+             * If we do not have a namespace, then by making up
+             * a non existent namespace and providing
+             * this.data to `getNamespace` we ensure that we
+             * append to this.data.
+             * @see getNamespace
+             */
+            if (namespace) {
+                key = key.replace(new RegExp('^' + namespace + '\\.'), '');
+            } else namespace = 'SKIP_DEFAULT_NAMESAPCE_GET__DATA_OBJECT';
+
             _setPropertyChain(this.getNamespace(namespace, this.data), key, value);
             return this;
         };
@@ -126,6 +139,7 @@
     /******************************************************
      * EXPOSE HELPER METHODS FOR UNIT TESTING.
     /******************************************************/
+    GCPPath.setPropertyChain = _setPropertyChain;
     GCPPath.resolvePropertyChain = _resolvePropertyChain;
 
     return GCPPath;
