@@ -64,10 +64,10 @@
      * @param  {Function|Object} src
      * @return {void}
      */
-    var _using = function(ext, src) {
-        if (typeof ext === 'function') ext(src);
+    var _using = function(ext, src, options) {
+        if (typeof ext === 'function') ext(src, options);
         else if ('register' in ext &&
-            typeof ext.register === 'function') ext.register(src);
+            typeof ext.register === 'function') ext.register(src, options);
         else if (typeof ext === 'object') _extend(src, ext);
     };
 
@@ -143,7 +143,6 @@
         config = _extend({}, GConfig.defaults || _OPTIONS, config);
 
         this.data = config.data || {};
-        this.meta = document.getElementsByTagName('meta');
 
         this.namespaces = [];
         this.options = config;
@@ -157,6 +156,8 @@
         this.init(config);
     };
 
+    GConfig.VERSION = '0.6.8';
+
     /**
      * GConfig default config object.
      */
@@ -166,6 +167,13 @@
      * GConfig configuration loaders.
      */
     GConfig.CONF_LOADERS = ['loadMedatada'];
+
+    /**
+     * Register of plugins that have
+     * extended GConfig.
+     * @type {Object}
+     */
+    GConfig.PLUGINS = {};
 
     /**
      * Module loader, defaults
@@ -203,6 +211,7 @@
         var plugins = [].slice.call(arguments);
         plugins.forEach(function(plugin) {
             _using(plugin, this);
+            GConfig.PLUGINS[plugin.ID] = plugin.VERSION;
         }, this);
         return this;
     };
@@ -272,10 +281,10 @@
     };
 
     GConfig.prototype.onConfigLoaded = function() {
-        //Schedule for next tick.
+        //Schedule for next tick, so that registered
+        //events get notified regardless.
         setTimeout((function() {
             this.emit('ondata');
-            console.warn('ON DATA!!');
         }).bind(this), 0);
     };
 
