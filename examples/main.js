@@ -44,9 +44,7 @@ define(function(require) {
         });
     };
 
-    GConfig.extend(GCPPath);
-    GConfig.extend(GConfigQS);
-    GConfig.extend(GCInterpolate);
+    GConfig.extend(GCPPath, GConfigQS, GCInterpolate);
 
     var config = new GConfig({
         loaders: [jsonLoader]
