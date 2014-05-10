@@ -139,8 +139,9 @@
     /******************************************************
      * EXPOSE HELPER METHODS FOR UNIT TESTING.
     /******************************************************/
-    GCPPath.setPropertyChain = _setPropertyChain;
-    GCPPath.resolvePropertyChain = _resolvePropertyChain;
+    GCPPath.h = {};
+    GCPPath.h.setPropertyChain = _setPropertyChain;
+    GCPPath.h.resolvePropertyChain = _resolvePropertyChain;
 
     return GCPPath;
 }));
