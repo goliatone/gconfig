@@ -61,20 +61,28 @@
         return target;
     };
 
-    var _compiled = function(template, context, getter, otag, ctag) {
-        template = template.split('.').join('\\.');
-
-        function replaceFn() {
-            var prop = arguments[1];
-            prop = prop.replace(/\\/g, '');
-            // console.log('PROP', prop.replace(/\\/g, ''), context);
-
-            return _resolvePropertyChain(context, prop)
-        }
+    /**
+     * Simplte string interpolation function.
+     * @param   {String} template
+     * @param   {Object} context
+     * @param   {String} otag     Open tag
+     * @param   {String} ctag     Close tag
+     * @return  {String}
+     * @private
+     */
+    var _template = function(template, context, getter, otag, ctag) {
         otag = otag || '@{';
         ctag = ctag || '}';
-        // console.warn('template', otag + '(\\w+)' + ctag);
-        return template.replace(/@{([^}\r\n]*)}/g, replaceFn);
+
+        template = template.split('.').join('\\.');
+
+        function replaceTokens() {
+            var prop = arguments[1];
+            prop = prop.replace(/\\/g, '');
+            return _resolvePropertyChain(context, prop);
+        }
+
+        return template.replace(/@{([^}\r\n]*)}/g, replaceTokens);
     };
 
     var _needsInterpolation = function(key) {
@@ -92,21 +100,42 @@
      */
     var GCInterpolate = {};
 
+    /**
+     * Registers the plugin with `GConfig`.
+     * @param  {Object} GConfig GConfig class.
+     */
     GCInterpolate.register = function(GConfig) {
         var _get = GConfig.prototype.get;
 
+        /**
+         * Overload `get` method with interpolation.
+         * @param  {String} key          Configuration key
+         * @param  {Mixed} defaultValue  Default value
+         * @param  {String} namespace    Namespace id
+         * @return {Mixed}
+         */
         GConfig.prototype.get = function(key, devaultValue, namespace) {
             var value = _get.call(this, key, devaultValue, namespace);
             if (!_needsInterpolation(value)) return value;
-            return _compiled(value, this.data, this.get);
+            return _template(value, this.data);
         };
 
+        /**
+         * Explicit call to solve a templated expression
+         * @param  {String} key          Configuration key
+         * @param  {Mixed} defaultValue  Default value
+         * @param  {String} namespace    Namespace id
+         * @return {Mixed}
+         */
         GConfig.prototype.interpolate = function(key, defaultValue, namespace) {
-            var value = this.get(key, defaultValue, namespace);
-            // console.log('interpolate', value);
-            return _compiled(value, this.data, this.get);
+            return this.get(key, defaultValue, namespace);
         };
 
+        /**
+         * Cycles through a GConfig instance and solves
+         * all template references.
+         * @return {this}
+         */
         GConfig.prototype.solveDependencies = function() {
 
             var solve = function solve(data, namespace, self) {
@@ -114,17 +143,25 @@
                 Object.keys(data).forEach(function(key) {
                     if (typeof data[key] === 'string') {
                         value = self.get(key, data[key], namespace);
-                        // console.info('key', key, namespace, data[key]);
                         self.set(key, value, namespace);
                     } else {
-                        // console.warn('key', key);
                         solve(data[key], key, self);
                     }
                 });
             };
+
             solve(this.data, this.namespace, this);
+
+            return this;
         };
     };
+
+    /******************************************************
+     * EXPOSE HELPER METHODS FOR UNIT TESTING.
+    /******************************************************/
+    GCInterpolate.template = _template;
+    GCInterpolate.needsInterpolation = _needsInterpolation;
+    GCInterpolate.resolvePropertyChain = _resolvePropertyChain;
 
     return GCInterpolate;
 }));
