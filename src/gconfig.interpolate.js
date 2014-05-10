@@ -99,12 +99,18 @@
      * @param  {object} config Configuration object.
      */
     var GCInterpolate = {};
+    GCInterpolate.VERSION = '0.1.3';
+    GCInterpolate.ID = 'GCInterpolate';
 
     /**
      * Registers the plugin with `GConfig`.
      * @param  {Object} GConfig GConfig class.
      */
     GCInterpolate.register = function(GConfig) {
+        /*
+         * Keep a reference to the original
+         * `get` method.
+         */
         var _get = GConfig.prototype.get;
 
         /**
