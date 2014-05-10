@@ -423,5 +423,13 @@
     GConfig.prototype.addMeta = GConfig.prototype.set;
     GConfig.prototype.getMeta = GConfig.prototype.get;
 
+    /******************************************************
+     * EXPOSE HELPER METHODS FOR UNIT TESTING.
+    /******************************************************/
+    GConfig.h = {};
+    GConfig.h.map = _map;
+    GConfig.h.using = _using;
+    GConfig.h.extend = _extend;
+
     return GConfig;
 }));
