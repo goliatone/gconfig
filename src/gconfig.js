@@ -220,7 +220,7 @@
     ///////////////////////////////////////////////////
 
     GConfig.prototype.init = function(config) {
-        if (this.initialized) return;
+        if (this.initialized) return false;
         this.initialized = true;
 
         config = _extend({}, GConfig.defaults || _OPTIONS, config);
