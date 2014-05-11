@@ -48,7 +48,8 @@
      * @private
      */
     var _resolvePropertyChain = function(target, path, defaultValue) {
-        if (typeof path === 'string') path = path.split('.');
+        if(!target || !path) return defaultValue;
+        path = path.split('.');
         // console.warn('path', path, target);
         var l = path.length,
             i = 0,
@@ -70,7 +71,10 @@
      * @return  {String}
      * @private
      */
-    var _template = function(template, context, getter, otag, ctag) {
+    var _template = function(template, context, otag, ctag) {
+        if(!template) return '';
+        if(!context) return template;
+
         otag = otag || '@{';
         ctag = ctag || '}';
 
@@ -79,13 +83,14 @@
         function replaceTokens() {
             var prop = arguments[1];
             prop = prop.replace(/\\/g, '');
-            return _resolvePropertyChain(context, prop);
+            return _resolvePropertyChain(context, prop, otag+prop+ctag);
         }
 
         return template.replace(/@{([^}\r\n]*)}/g, replaceTokens);
     };
 
     var _needsInterpolation = function(key) {
+        if(!key) return false;
         return !!key.match(/@{([^}\r\n]*)}/g);
     };
 
@@ -107,6 +112,8 @@
      * @param  {Object} GConfig GConfig class.
      */
     GCInterpolate.register = function(GConfig) {
+        // if(GConfig.PLUGINS[this.ID]) return true;
+
         /*
          * Keep a reference to the original
          * `get` method.
@@ -165,9 +172,10 @@
     /******************************************************
      * EXPOSE HELPER METHODS FOR UNIT TESTING.
     /******************************************************/
-    GCInterpolate.template = _template;
-    GCInterpolate.needsInterpolation = _needsInterpolation;
-    GCInterpolate.resolvePropertyChain = _resolvePropertyChain;
+    GCInterpolate.h = {};
+    GCInterpolate.h.template = _template;
+    GCInterpolate.h.needsInterpolation = _needsInterpolation;
+    GCInterpolate.h.resolvePropertyChain = _resolvePropertyChain;
 
     return GCInterpolate;
 }));
