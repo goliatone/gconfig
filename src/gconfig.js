@@ -156,7 +156,7 @@
         this.init(config);
     };
 
-    GConfig.VERSION = '0.6.8';
+    GConfig.VERSION = '0.6.9';
 
     /**
      * GConfig default config object.
