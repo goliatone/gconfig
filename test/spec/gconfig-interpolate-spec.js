@@ -135,6 +135,14 @@ define(['gconfig', 'gconfig.interpolate', 'jquery'], function(GConfig, GCInterpo
     });
 
     describe('interpolation', function(){
+        beforeEach(function() {
+            $('head').append(html);
+        });
+
+        afterEach(function(){
+            $('meta').remove();
+        });
+
         it('solve templates', function(){
             var config = new GConfig();
             var expected = 'http://localhost:9090';
