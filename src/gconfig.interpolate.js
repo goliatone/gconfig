@@ -112,7 +112,8 @@
      * @param  {Object} GConfig GConfig class.
      */
     GCInterpolate.register = function(GConfig) {
-        // if(GConfig.PLUGINS[this.ID]) return true;
+
+        if(GConfig.PLUGINS[this.ID]) return true;
 
         /*
          * Keep a reference to the original
