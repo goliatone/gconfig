@@ -46,8 +46,8 @@
 
     var _isObject = function(obj) {
         if(!obj) return false;
-        return obj.constructor.toString().indexOf('function Object') === 0; 
-        //return typeof obj === 'object';
+        return obj.constructor.toString().indexOf('function Object') === 0;
+        return typeof obj === 'object';
     };
 
     //TODO: Remove!! Replace with custom method
@@ -322,6 +322,8 @@
 
     GConfigQS.register = function(GConfig) {
 
+        // if(GConfig.PLUGINS[this.ID]) return true;
+
         /**
          * Register `loadQueryString` loader.
          */
@@ -355,7 +357,7 @@
             return data;
         };
     };
-    
+
     /******************************************************
      * EXPOSE HELPER METHODS FOR UNIT TESTING.
     /******************************************************/
