@@ -341,7 +341,7 @@
          * Load query string into our main data object.
          * @return {void}
          */
-        GConfig.prototype.loadQueryString = function(search) {
+        GConfig.prototype.loadQueryString = function(owner, search) {
             search = search || window.location.search;
             var qs = QueryString.parse(search);
             qs = this.filterAttributes(qs);
