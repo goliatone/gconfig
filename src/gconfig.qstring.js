@@ -322,7 +322,7 @@
 
     GConfigQS.register = function(GConfig) {
 
-        // if(GConfig.PLUGINS[this.ID]) return true;
+        if(GConfig.PLUGINS[this.ID]) return true;
 
         /**
          * Register `loadQueryString` loader.
