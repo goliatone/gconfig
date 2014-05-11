@@ -15,7 +15,7 @@ define(['gconfig', 'gconfig.path', 'jquery'], function(GConfig, GCPPath, $) {
         '<meta name="app:baseurl" content="http://localhost:9030">',
         '<meta name="app:default-controller" content="Controller">',
         '<meta name="widget:id" content="widgetId">'
-    ].join();
+    ].join('');
 
     var meta = {
         name: 'GConfig Tester',
@@ -28,6 +28,10 @@ define(['gconfig', 'gconfig.path', 'jquery'], function(GConfig, GCPPath, $) {
         beforeEach(function() {
             GConfig.extend(GCPPath);
             $('head').append(html);
+        });
+
+        afterEach(function(){
+            $('meta').remove();
         });
 
         it('should have an ID class property', function() {
