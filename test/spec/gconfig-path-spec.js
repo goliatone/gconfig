@@ -59,6 +59,35 @@ define(['gconfig', 'gconfig.path', 'jquery'], function(GConfig, GCPPath, $) {
             expect(config.data.app.test.value).toMatch('NewValue');
             expect(config.resolve('app.test.value')).toMatch('NewValue');
         });
+
+        it('if key is not a path it should behave like before extension', function() {
+            var config = new GConfig();
+            config.set('value', 'NewValue');
+            expect(config.data.app.value).toMatch('NewValue');
+            expect(config.get('value')).toMatch('NewValue');
+        });
+
+        it('set method should handle undefined keys', function() {
+            var config = new GConfig();
+            expect(config.set(undefined)).toBeTruthy();
+        });
+
+        it('if we provide the namespace in the path and as an argument', function() {
+            var config = new GConfig();
+            config.set('app.test.value', 'NewValue', 'app');
+            expect(config.resolve('app.test.value')).toMatch('NewValue');
+        });
+
+        it('should append right namespace', function() {
+            var config = new GConfig();
+            config.set('test.value', 'NewValue', 'app');
+            expect(config.resolve('app.test.value')).toMatch('NewValue');
+        });
+
+        it('given an inexistent path return default value', function() {
+            var config = new GConfig();
+            expect(config.resolve('nothing', 'DefaultValue')).toMatch('DefaultValue');
+        });
     });
 
     describe('GCPPath helper methods', function() {
@@ -68,6 +97,16 @@ define(['gconfig', 'gconfig.path', 'jquery'], function(GConfig, GCPPath, $) {
                 value = 'NewValue';
             GCPPath.h.setPropertyChain(source, path, value);
             expect(source.app.test.value).toMatch(value);
+        });
+
+        it('setPropertyChain can handle undefined targets', function() {
+            var output = GCPPath.h.setPropertyChain();
+            expect(output).toMatch(false);
+        });
+
+        it('resolvePropertyChain can handle undefined targets', function() {
+            var output = GCPPath.h.resolvePropertyChain();
+            expect(output).toMatch(false);
         });
 
         it('resolvePropertyChain', function() {
