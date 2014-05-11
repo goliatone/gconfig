@@ -16,9 +16,14 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
     ].join('');
 
     var meta = {
-        name: 'GConfig Tester',
-        baseurl: 'http://localhost:9030',
-        'default-controller': 'Controller'
+        app:{
+            name: 'GConfig Tester',
+            baseurl: 'http://localhost:9030',
+            'default-controller': 'Controller'
+        },
+        widget:{
+            id:'widgetId'
+        }
     };
 
     GConfig.extend(GConfigQS);
@@ -46,6 +51,11 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
             expect(GConfig.PLUGINS[GConfigQS.ID]).toMatch(GConfigQS.VERSION);
         });
 
+        it('GConfig should load metadata', function(){
+            var config = new GConfig();
+            expect(config.data).toMatchObject(meta);
+        });
+
         it('should have one extra method added by path plugin', function() {
             var config = new GConfig();
             expect(config).toHaveMethods(['toQueryString', 'loadQueryString', 'filterAttributes']);
@@ -63,7 +73,7 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
                 queryString = '?app[name]=GConfig+Tester&app[baseurl]=http%3A%2F%2Flocalhost%3A9030&app[default-controller]=Controller&widget[id]=widgetId';
 
             expected.data = {};
-            expected.loadQueryString(queryString);
+            expected.loadQueryString(null, queryString);
             expect(config.data).toMatchObject(expected.data);
         });
 
@@ -103,6 +113,14 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
 
     describe('QueryString', function() {
         var QueryString = GConfigQS.h.QueryString;
+
+        beforeEach(function() {
+            $('head').append(html);
+        });
+
+        afterEach(function(){
+            $('meta').remove();
+        });
 
         it('should have a QueryString object', function() {
             expect(GConfigQS.h.QueryString).toBeTruthy();
