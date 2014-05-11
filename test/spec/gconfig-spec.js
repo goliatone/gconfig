@@ -12,7 +12,7 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
         '<meta name="app:name" content="GConfig Tester">',
         '<meta name="app:baseurl" content="http://localhost:9030">',
         '<meta name="app:default-controller" content="Controller">',
-        '<meta name="widget:id" content="widgetId">'].join();
+        '<meta name="widget:id" content="widgetId">'].join('');
 
     var meta = {
         name:'GConfig Tester',
@@ -26,10 +26,20 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
             $('head').append(html);
         });
 
-        it('GConfig shold be loaded', function() {
+        afterEach(function(){
+            $('meta').remove();
+        });
+
+        it('GConfig should be loaded', function() {
             expect(GConfig).toBeTruthy();
             var config = new GConfig();
             expect(config).toBeTruthy();
+        });
+
+        it('should initialize only once', function(){
+            var config = new GConfig();
+            expect(config.initialized).toBe(true);
+            expect(config.init()).toBe(false);
         });
 
         it('should get all meta keys', function(){
@@ -80,11 +90,6 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
             config.addMeta('added','addedMeta');
             expect(config.get('added')).toEqual('addedMeta');
             expect(config.getMeta('added')).toEqual('addedMeta');
-        });
-
-        it('getNamespace by defualt should return config object', function(){
-            var config = new GConfig();
-            expect(config.getNamespace()).toMatch(meta);
         });
 
         it('should namespace correctly.', function() {
@@ -155,6 +160,34 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
         it('api getMeta and get should be same method', function(){
             var config = new GConfig();
             expect(config.getMeta).toMatchObject(config.get);
+        });
+    });
+
+    describe('methods', function(){
+        it('should have a stub emit method', function(){
+            expect(GConfig.prototype.emit).toEqual(function(){});
+        });
+
+        it('should have a logger method that defaults to console object', function(){
+            expect(GConfig.prototype.logger).toEqual(console);
+        });
+
+        it('getNamespace by default should return config object', function(){
+            var config = new GConfig();
+            expect(config.getNamespace()).toMatch(meta);
+        });
+
+        it('getNamespace by default should return default namespace object', function(){
+            var config = new GConfig(),
+                expected = config.data[conifg.namespace];
+            expect(config.getNamespace()).toBe(expected);
+        });
+
+        it('getNamespace', function(){
+            var config = new GConfig(),
+                expected = config.data[conifg.namespace];
+            expect(config.getNamespace(null, true )).toMatch(expected);
+
         });
     });
 
