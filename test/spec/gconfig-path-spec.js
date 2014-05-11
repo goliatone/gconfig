@@ -18,9 +18,14 @@ define(['gconfig', 'gconfig.path', 'jquery'], function(GConfig, GCPPath, $) {
     ].join('');
 
     var meta = {
-        name: 'GConfig Tester',
-        baseurl: 'http://localhost:9030',
-        'default-controller': 'Controller'
+        app:{
+            name: 'GConfig Tester',
+            baseurl: 'http://localhost:9030',
+            'default-controller': 'Controller'
+        },
+        widget:{
+            id:'widgetId'
+        }
     };
 
     describe('GCPPath plugin...', function() {
@@ -45,6 +50,11 @@ define(['gconfig', 'gconfig.path', 'jquery'], function(GConfig, GCPPath, $) {
         it('should be tracked by GConfig', function() {
             expect(GConfig.PLUGINS).toHaveProperties(GCPPath.ID);
             expect(GConfig.PLUGINS[GCPPath.ID]).toMatch(GCPPath.VERSION);
+        });
+
+        it('GConfig should load expected meta', function(){
+            var config = new GConfig();
+            expect(config.data).toMatchObject(meta);
         });
 
         it('should have one extra method added by path plugin', function() {
