@@ -15,9 +15,14 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
         '<meta name="widget:id" content="widgetId">'].join('');
 
     var meta = {
-        name:'GConfig Tester',
-        baseurl:'http://localhost:9030',
-        'default-controller':'Controller'
+        app:{
+            name: 'GConfig Tester',
+            baseurl: 'http://localhost:9030',
+            'default-controller': 'Controller'
+        },
+        widget:{
+            id:'widgetId'
+        }
     };
 
     describe('just checking', function() {
@@ -42,12 +47,9 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
             expect(config.init()).toBe(false);
         });
 
-        it('should get all meta keys', function(){
+        it('GConfig should load expected meta', function(){
             var config = new GConfig();
-            Object.keys(meta).map(function(key){
-                expect(meta[key]).toEqual(config.get(key));
-                expect(meta[key]).toEqual(config.getMeta(key));
-            });
+            expect(config.data).toMatchObject(meta);
         });
 
         it('it should return the same content for different instances', function(){
@@ -113,13 +115,15 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
         it('should configure passed in objects.', function() {
             var config = new GConfig();
             var configured = config.configure({});
-            expect(configured).toMatch(meta);
+            var expected = meta[config.namespace];
+            expect(configured).toMatch(expected);
         });
 
         it('should configure passed in objects.', function() {
             var config = new GConfig();
             var configured = config.configure({});
-            expect(configured).toMatch(meta);
+            var expected = meta[config.namespace];
+            expect(configured).toMatch(expected);
         });
 
         it('should configure passed in objects by namespace.', function() {
@@ -174,7 +178,8 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
 
         it('getNamespace by default should return config object', function(){
             var config = new GConfig();
-            expect(config.getNamespace()).toMatch(meta);
+            var expected = meta[config.namespace];
+            expect(config.getNamespace()).toMatch(expected);
         });
 
         it('getNamespace by default should return default namespace object', function(){
