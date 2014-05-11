@@ -36,9 +36,7 @@
             return mod;
         };
     }
-    //TODO: Get rid of jquery!
 }(this, 'gconfig.path', function() {
-
 
     /**
      * Returns the value of a path in dot notation
@@ -51,7 +49,8 @@
      * @private
      */
     var _resolvePropertyChain = function(target, path, defaultValue) {
-        if (typeof path === 'string') path = path.split('.');
+        if (!target || !path) return false;
+        path = path.split('.');
         var l = path.length,
             i = 0,
             p = '';
@@ -64,7 +63,8 @@
     };
 
     var _setPropertyChain = function(target, key, value) {
-        if (!target) throw new Error('WE NEED A VALID TARGET');
+        if (!target) return false;
+
         var keys = key.split('.');
         key = keys.pop();
         keys.forEach(function(prop) {
@@ -89,6 +89,8 @@
     GCPPath.VERSION = '0.3.0';
 
     GCPPath.register = function(GConfig) {
+        if(GConfig.PLUGINS[this.ID]) return true;
+
         /*
          * Keep a reference to the original
          * `set` method.
@@ -103,6 +105,10 @@
          * @return {Mixed}
          */
         GConfig.prototype.resolve = function(path, defaultValue) {
+            /*if (path.indexOf('.') !== -1) {
+                var namespace = path.split('.')[0];
+                if (!this.data.hasOwnProperty(namespace)) this.logger.warn('Invalid path');
+            }*/
             return _resolvePropertyChain(this.data, path, defaultValue);
         };
 
