@@ -45,11 +45,16 @@
         };
 
     var _isObject = function(obj) {
-        return typeof obj === 'object';
+        if(!obj) return false;
+        return obj.constructor.toString().indexOf('function Object') === 0; 
+        //return typeof obj === 'object';
     };
 
+    //TODO: Remove!! Replace with custom method
     var _each = $.each;
+
     /**
+     * TODO: Remove!! Replace with custom method
      * Extend method.
      * @param  {Object} target Source object
      * @return {Object}        Resulting object from
@@ -144,7 +149,6 @@
             }
         }
     };
-
 
     var RE_PLUS = /\+/g;
     var RE_PAIR = /([^&=]+)=?([^&]*)/g;
@@ -300,8 +304,8 @@
     };
 
     var QueryString = {};
-    QueryString.stringify = objectToQueryString;
     QueryString.parse = queryStringToObject;
+    QueryString.stringify = objectToQueryString;
 
     ///////////////////////////////////////////////////
     // CONSTRUCTOR
@@ -335,9 +339,9 @@
          * Load query string into our main data object.
          * @return {void}
          */
-        GConfig.prototype.loadQueryString = function() {
-            var search = window.location.search,
-                qs = QueryString.parse(search);
+        GConfig.prototype.loadQueryString = function(search) {
+            search = search || window.location.search;
+            var qs = QueryString.parse(search);
             qs = this.filterAttributes(qs);
             this.merge(qs, true);
         };
@@ -351,11 +355,27 @@
             return data;
         };
     };
-
+    
     /******************************************************
      * EXPOSE HELPER METHODS FOR UNIT TESTING.
     /******************************************************/
-    GConfigQS.QueryString = QueryString;
+    GConfigQS.h = {};
+    GConfigQS.h.isArray = _isArray;
+    GConfigQS.h.isObject = _isObject;
+    GConfigQS.h.each = _each;
+    GConfigQS.h.extend = _extend;
+    GConfigQS.h.RE_PLUS;
+    GConfigQS.h.RE_PAIR;
+    GConfigQS.h.encodedKeyValues;
+    GConfigQS.h.decoders = decoders;
+    GConfigQS.h.encoders = encoders;
+    GConfigQS.h.encodeObject = encodeObject;
+    GConfigQS.h.serializeObject = serializeObject;
+    GConfigQS.h.unserializeObject = unserializeObject;
+    GConfigQS.h.objectToQueryString = objectToQueryString;
+    GConfigQS.h.decodeKeyValue = decodeKeyValue;
+    GConfigQS.h.queryStringToObject = queryStringToObject;
+    GConfigQS.h.QueryString = QueryString;
 
     return GConfigQS;
 }));
