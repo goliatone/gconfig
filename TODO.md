@@ -6,7 +6,7 @@
 Should we get rid of jQuery?
 We use `$.proxy` and `$.extend`
 
-```
+```javascript
 var metaTags=document.getElementsByTagName("meta");
 var selector = options.selector.replace('::NAMESPACE::', namespace);
 
