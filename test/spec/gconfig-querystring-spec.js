@@ -13,7 +13,7 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
         '<meta name="app:baseurl" content="http://localhost:9030">',
         '<meta name="app:default-controller" content="Controller">',
         '<meta name="widget:id" content="widgetId">'
-    ].join();
+    ].join('');
 
     var meta = {
         name: 'GConfig Tester',
@@ -21,11 +21,16 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
         'default-controller': 'Controller'
     };
 
+    GConfig.extend(GConfigQS);
+
     describe('GConfigQS plugin...', function() {
 
         beforeEach(function() {
-            GConfig.extend(GConfigQS);
             $('head').append(html);
+        });
+
+        afterEach(function(){
+            $('meta').remove();
         });
 
         it('should have an ID class property', function() {
@@ -51,6 +56,7 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
             var expected = '?app[name]=GConfig+Tester&app[baseurl]=http%3A%2F%2Flocalhost%3A9030&app[default-controller]=Controller&widget[id]=widgetId';
             expect(config.toQueryString()).toEqual(expected);
         });
+
         it('should load a window query string to a config instance', function() {
             var config = new GConfig(),
                 expected = new GConfig(),
