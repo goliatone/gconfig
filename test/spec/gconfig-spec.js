@@ -52,6 +52,21 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
             expect(config.data).toMatchObject(meta);
         });
 
+        it('should take default data values', function(){
+            var config = new GConfig({data:{
+                foo:{
+                    bar:'baz',
+                    bir:'biz'
+                }
+            }});
+            expect(config.get('bar', '', 'foo')).toEqual('baz');
+        });
+
+        it('we should be able to set default namespace in config', function(){
+            var config = new GConfig({namespace:'widget'});
+            expect(config.get('id')).toEqual(meta.widget.id);
+        });
+
         it('it should return the same content for different instances', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
@@ -74,12 +89,12 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
             expect(config.data[config.options.namespace].key).toMatch('value');
         });
 
-        /*it('changes to one instance should not modify others.', function(){
+        it('changes to one instance should not modify others.', function(){
             var config1 = new GConfig();
             var config2 = new GConfig();
             config1.set('added','addedMeta');
             expect(config2.data).toMatchObject(config1.data);
-        });*/
+        });
 
         it('if no key matches should return default parameter', function(){
             var config = new GConfig();
