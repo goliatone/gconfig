@@ -66,8 +66,7 @@
      */
     var _using = function(ext, src, options) {
         if (typeof ext === 'function') ext(src, options);
-        else if ('register' in ext &&
-            typeof ext.register === 'function') ext.register(src, options);
+        else if (ext && typeof ext.register === 'function') ext.register(src, options);
         else if (typeof ext === 'object') _extend(src, ext);
     };
 
@@ -182,6 +181,9 @@
      */
     GConfig.loader = require;
 
+
+    GConfig.logger = console;
+
     /**
      * Require plugins and register on
      * load. Asynchronous
@@ -210,7 +212,13 @@
     GConfig.extend = function() {
         var plugins = [].slice.call(arguments);
         plugins.forEach(function(plugin) {
-            _using(plugin, this);
+            if(!plugin){ 
+                return this.logger.warn('Null plugin registered!');
+            }            
+            _using(plugin, this);            
+            if(! plugin.hasOwnProperty('ID') || ! plugin.hasOwnProperty('ID')){
+                return this.logger.warn('Plugin does not have ID or VERSION property.');
+            }
             GConfig.PLUGINS[plugin.ID] = plugin.VERSION;
         }, this);
         return this;
