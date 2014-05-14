@@ -10,7 +10,7 @@ module.exports = function (grunt) {
 
     // configurable paths
     var config = {
-        name: 'gmodel',
+        name: 'gconfig',
         src: 'src',
         dist: 'dist',
         libs: 'lib',
@@ -159,7 +159,21 @@ module.exports = function (grunt) {
                 pushTo: 'origin',
                 gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d' // options to use with '$ git describe'
             }
-        }
+        },
+        'string-replace': {
+            version: {
+                files: {
+                    'src/gconfig.js':'src/gconfig.js'    
+                },
+            options: {
+              replacements: [{
+                pattern: /GConfig\.VERSION\s*=\s*'.*';/g,
+                replacement: 'GConfig\.VERSION = \'<%= pkg.version %>\';'
+              }]
+            }
+          }
+        },
+        pkg: grunt.file.readJSON('package.json')
     });
 
     grunt.renameTask('regarde', 'watch');
@@ -186,6 +200,8 @@ module.exports = function (grunt) {
         'copy',
         'uglify',
     ]);
+
+    grunt.registerTask('release', ['build', 'bump', 'string-replace']);
 
     grunt.registerTask('default', ['build']);
 };
