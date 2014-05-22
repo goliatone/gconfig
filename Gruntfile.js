@@ -201,7 +201,8 @@ module.exports = function (grunt) {
         'uglify',
     ]);
 
-    grunt.registerTask('release', ['build', 'bump', 'string-replace']);
+    //TODO: Make this for realz...
+    grunt.registerTask('release', ['bump', 'string-replace', 'build']);
 
     grunt.registerTask('default', ['build']);
 };

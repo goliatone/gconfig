@@ -48,7 +48,7 @@
      * @private
      */
     var _resolvePropertyChain = function(target, path, defaultValue) {
-        if(!target || !path) return defaultValue;
+        if (!target || !path) return defaultValue;
         path = path.split('.');
         // console.warn('path', path, target);
         var l = path.length,
@@ -72,8 +72,8 @@
      * @private
      */
     var _template = function(template, context, otag, ctag) {
-        if(!template) return '';
-        if(!context) return template;
+        if (!template) return '';
+        if (!context) return template;
 
         otag = otag || '@{';
         ctag = ctag || '}';
@@ -83,14 +83,14 @@
         function replaceTokens() {
             var prop = arguments[1];
             prop = prop.replace(/\\/g, '');
-            return _resolvePropertyChain(context, prop, otag+prop+ctag);
+            return _resolvePropertyChain(context, prop, otag + prop + ctag);
         }
 
         return template.replace(/@{([^}\r\n]*)}/g, replaceTokens);
     };
 
     var _needsInterpolation = function(key) {
-        if(!key) return false;
+        if (!key) return false;
         return !!key.match(/@{([^}\r\n]*)}/g);
     };
 
@@ -104,7 +104,7 @@
      * @param  {object} config Configuration object.
      */
     var GCInterpolate = {};
-    GCInterpolate.VERSION = '0.1.3';
+    GCInterpolate.VERSION = '0.1.4';
     GCInterpolate.ID = 'GCInterpolate';
 
     /**
@@ -113,7 +113,7 @@
      */
     GCInterpolate.register = function(GConfig) {
 
-        if(GConfig.PLUGINS[this.ID]) return true;
+        if (GConfig.PLUGINS[this.ID]) return true;
 
         /*
          * Keep a reference to the original
@@ -151,8 +151,8 @@
          * @return {this}
          */
         GConfig.prototype.solveDependencies = function() {
-
             var solve = function solve(data, namespace, self) {
+                if (!data || typeof data !== 'object') return;
                 var value;
                 Object.keys(data).forEach(function(key) {
                     if (typeof data[key] === 'string') {
