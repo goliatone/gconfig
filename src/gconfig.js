@@ -127,7 +127,8 @@
 
     var _OPTIONS = {
         selector: 'meta[name^="::NAMESPACE::-"]',
-        namespace: 'app'
+        namespace: 'app',
+        autoinitialize: true
     };
 
     /**
@@ -152,7 +153,7 @@
 
         this.initialized = false;
 
-        this.init(config);
+        if (config.autoinitialize) this.init(config);
     };
 
     GConfig.VERSION = '0.6.12';
@@ -212,11 +213,11 @@
     GConfig.extend = function() {
         var plugins = [].slice.call(arguments);
         plugins.forEach(function(plugin) {
-            if(!plugin){ 
+            if (!plugin) {
                 return this.logger.warn('Null plugin registered!');
-            }            
-            _using(plugin, this);            
-            if(! plugin.hasOwnProperty('ID') || ! plugin.hasOwnProperty('ID')){
+            }
+            _using(plugin, this);
+            if (!plugin.hasOwnProperty('ID') || !plugin.hasOwnProperty('ID')) {
                 return this.logger.warn('Plugin does not have ID or VERSION property.');
             }
             GConfig.PLUGINS[plugin.ID] = plugin.VERSION;
@@ -235,6 +236,9 @@
         _extend(this, config);
 
         this.getConfig();
+
+        this.postInit();
+
         this.logger.log('META: ', this.data);
     };
 
@@ -256,6 +260,18 @@
 
         //Iterate over loaders, and execute each. It could be async.
         _map(this.loaders, this.onConfigLoaded.bind(this), this);
+    };
+
+    /**
+     * Post initialization method. The current
+     * implementation will not work since we have
+     * `autoinitialize` and we do not have time
+     * to add the listener.
+     *
+     * @return {void}
+     */
+    GConfig.prototype.postInit = function() {
+        this.emit('initialized');
     };
 
     /**
