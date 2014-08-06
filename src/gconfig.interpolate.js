@@ -90,7 +90,7 @@
     };
 
     var _needsInterpolation = function(key) {
-        if (!key) return false;
+        if (!key || typeof key !== 'string') return false;
         return !!key.match(/@{([^}\r\n]*)}/g);
     };
 
