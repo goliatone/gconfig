@@ -12,26 +12,27 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
         '<meta name="app:name" content="GConfig Tester">',
         '<meta name="app:baseurl" content="http://localhost:9030">',
         '<meta name="app:default-controller" content="Controller">',
-        '<meta name="widget:id" content="widgetId">'].join('');
+        '<meta name="widget:id" content="widgetId">'
+    ].join('');
 
     var meta = {
-        app:{
+        app: {
             name: 'GConfig Tester',
             baseurl: 'http://localhost:9030',
             'default-controller': 'Controller'
         },
-        widget:{
-            id:'widgetId'
+        widget: {
+            id: 'widgetId'
         }
     };
 
     describe('just checking', function() {
 
-        beforeEach(function(){
+        beforeEach(function() {
             $('head').append(html);
         });
 
-        afterEach(function(){
+        afterEach(function() {
             $('meta').remove();
         });
 
@@ -41,70 +42,74 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
             expect(config).toBeTruthy();
         });
 
-        it('should initialize only once', function(){
+        it('should initialize only once', function() {
             var config = new GConfig();
             expect(config.initialized).toBe(true);
             expect(config.init()).toBe(false);
         });
 
-        it('GConfig should load expected meta', function(){
+        it('GConfig should load expected meta', function() {
             var config = new GConfig();
             expect(config.data).toMatchObject(meta);
         });
 
-        it('should take default data values', function(){
-            var config = new GConfig({data:{
-                foo:{
-                    bar:'baz',
-                    bir:'biz'
+        it('should take default data values', function() {
+            var config = new GConfig({
+                data: {
+                    foo: {
+                        bar: 'baz',
+                        bir: 'biz'
+                    }
                 }
-            }});
+            });
             expect(config.get('bar', '', 'foo')).toEqual('baz');
         });
 
-        it('we should be able to set default namespace in config', function(){
-            var config = new GConfig({namespace:'widget'});
+        it('we should be able to set default namespace in config', function() {
+            var config = new GConfig({
+                namespace: 'widget'
+            });
             expect(config.get('id')).toEqual(meta.widget.id);
         });
 
-        it('it should return the same content for different instances', function(){
+        it('it should return the same content for different instances', function() {
             var config1 = new GConfig();
             var config2 = new GConfig();
             expect(config1.data).toMatchObject(config2.data);
         });
 
-        it('generateMeta should parse DOM correctly', function(){
+        it('generateMeta should parse DOM correctly', function() {
 
         });
 
-        it('should have a default namespace',function(){
+        it('should have a default namespace', function() {
             var config = new GConfig();
             //TODO: We should not have to fuck with namespace this way, make configurable
             expect(config.options.namespace).toMatch('app');
         });
 
-        it('should set a key value in default namespace',function(){
+        it('should set a key value in default namespace', function() {
             var config = new GConfig();
             config.set('key', 'value');
             expect(config.data[config.options.namespace].key).toMatch('value');
         });
 
-        it('changes to one instance should not modify others.', function(){
+        it('changes to one instance should not modify others.', function() {
             var config1 = new GConfig();
             var config2 = new GConfig();
-            config1.set('added','addedMeta');
+            config1.set('added', 'addedMeta');
             expect(config2.data).toMatchObject(config1.data);
         });
 
-        it('if no key matches should return default parameter', function(){
+        it('if no key matches should return default parameter', function() {
             var config = new GConfig();
-            expect(config.get('nothing','defaultValue')).toEqual('defaultValue');
-            expect(config.getMeta('nothing','defaultValue')).toEqual('defaultValue');
+            expect(config.get('nothing', 'defaultValue')).toEqual('defaultValue');
+            expect(config.getMeta('nothing', 'defaultValue')).toEqual('defaultValue');
         });
 
-        it('addMeta should update config', function(){
+        it('addMeta should update config', function() {
             var config = new GConfig();
-            config.addMeta('added','addedMeta');
+            config.addMeta('added', 'addedMeta');
             expect(config.get('added')).toEqual('addedMeta');
             expect(config.getMeta('added')).toEqual('addedMeta');
         });
@@ -117,14 +122,14 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
 
         it('if no key matches for the given namespace should return default parameter', function() {
             var config = new GConfig();
-            expect(config.get('nothing','defaultValue', 'widget')).toEqual('defaultValue');
-            expect(config.getMeta('nothing','defaultValue', 'widget')).toEqual('defaultValue');
+            expect(config.get('nothing', 'defaultValue', 'widget')).toEqual('defaultValue');
+            expect(config.getMeta('nothing', 'defaultValue', 'widget')).toEqual('defaultValue');
         });
 
         it('if the given namespace does not exists should return default parameter', function() {
             var config = new GConfig();
-            expect(config.get('nothing','defaultValue', 'nothing')).toEqual('defaultValue');
-            expect(config.getMeta('nothing','defaultValue', 'nothing')).toEqual('defaultValue');
+            expect(config.get('nothing', 'defaultValue', 'nothing')).toEqual('defaultValue');
+            expect(config.getMeta('nothing', 'defaultValue', 'nothing')).toEqual('defaultValue');
         });
 
         it('should configure passed in objects.', function() {
@@ -144,71 +149,108 @@ define('gconfig-spec', ['gconfig', 'jquery'], function(GConfig, $) {
         it('should configure passed in objects by namespace.', function() {
             var config = new GConfig();
             var configured = config.configure({}, 'widget');
-            expect(configured).toMatch({id:"widgetId"});
+            expect(configured).toMatch({
+                id: "widgetId"
+            });
         });
 
-        it('should merge object to config', function(){
+        it('should merge object to config', function() {
             var config = new GConfig();
-            var cplus  = {a:1,b:'c'};
+            var cplus = {
+                a: 1,
+                b: 'c'
+            };
             config.merge(cplus);
-            for(var key in cplus) expect(config.get(key)).toEqual(cplus[key]);
+            for (var key in cplus) expect(config.get(key)).toEqual(cplus[key]);
         });
 
-        it('should merge object to namespaced config', function(){
+        it('should merge object to namespaced config', function() {
             var config = new GConfig();
-            var cplus  = {a:1,b:'c'};
+            var cplus = {
+                a: 1,
+                b: 'c'
+            };
             var namespace = 'widget';
             config.merge(cplus, namespace);
-            for(var key in cplus)
+            for (var key in cplus)
                 expect(config.get(key, 'default', namespace)).toEqual(cplus[key]);
         });
 
-        it('can be extended by plugins with the use method', function(){
+        it('can be extended by plugins with the use method', function() {
             var expected = 'something';
-            var plugin = {ext:function(){return expected;}};
+            var plugin = {
+                ext: function() {
+                    return expected;
+                }
+            };
             var config = new GConfig().use(plugin);
             expect(config).toHaveMethods('ext');
             expect(config.ext()).toEqual(expected);
         });
 
-        it('api addMeta and set should be same method', function(){
+        it('api addMeta and set should be same method', function() {
             var config = new GConfig();
             expect(config.addMeta).toMatchObject(config.set);
         });
 
-        it('api getMeta and get should be same method', function(){
+        it('api getMeta and get should be same method', function() {
             var config = new GConfig();
             expect(config.getMeta).toMatchObject(config.get);
         });
     });
 
-    describe('methods', function(){
-        it('should have a stub emit method', function(){
-            expect(GConfig.prototype.emit).toEqual(function(){});
+    describe('methods', function() {
+        it('should have a stub emit method', function() {
+            expect(GConfig.prototype.emit).toEqual(function() {});
         });
 
-        it('should have a logger method that defaults to console object', function(){
+        it('should have a logger method that defaults to console object', function() {
             expect(GConfig.prototype.logger).toEqual(console);
         });
 
-        it('getNamespace by default should return config object', function(){
+        it('getNamespace by default should return config object', function() {
             var config = new GConfig();
             var expected = meta[config.namespace];
             expect(config.getNamespace()).toMatch(expected);
         });
 
-        it('getNamespace by default should return default namespace object', function(){
+        it('getNamespace by default should return default namespace object', function() {
             var config = new GConfig(),
                 expected = config.data[conifg.namespace];
             expect(config.getNamespace()).toBe(expected);
         });
 
-        it('getNamespace', function(){
+        it('getNamespace', function() {
             var config = new GConfig(),
                 expected = config.data[conifg.namespace];
-            expect(config.getNamespace(null, true )).toMatch(expected);
+            expect(config.getNamespace(null, true)).toMatch(expected);
 
         });
     });
 
+    describe('life cycle', function() {
+        it('should not call init if autoinitialize is set to false on config object', function() {
+            var config = new GConfig({
+                autoinitialize: false
+            });
+            expect(config.initialized).toBe(false);
+            config.init();
+            expect(config.initialized).toBe(true);
+        });
+
+        it('should init should call postInit', function() {
+            var config = new GConfig({
+                autoinitialize: false
+            });
+            config.postInit = sinon.spy()
+            expect(config.postInit).toHaveBeenCalled();
+        });
+
+        it('should take a custom postInit method in config and it should execute it', function() {
+            var config = new GConfig({
+                postInit: sinon.spy()
+            });
+            expect(config.postInit).toHaveBeenCalled();
+        });
+    });
 });
