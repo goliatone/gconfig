@@ -36,12 +36,23 @@
             return mod;
         };
     }
-}(this, 'gconfig.interpolate', function() {
+}(this, 'gconfig.interpolate', ['jquery'], function($) {
 
 
 
 
-
+    var jsonLoader = function(gconfig) {
+        var done = this.async();
+        $.ajax({
+            url: 'config.json'
+        }).done(function(data) {
+            window.cjson = data;
+            gconfig.merge(data, true);
+            done();
+        }).fail(function() {
+            done();
+        });
+    };
 
     ///////////////////////////////////////////////////
     // CONSTRUCTOR
@@ -52,15 +63,15 @@
      *
      * @param  {object} config Configuration object.
      */
-    var GCInterpolate = {};
-    GCInterpolate.VERSION = '0.1.4';
-    GCInterpolate.ID = 'GCInterpolate';
+    var JSONLoader = {};
+    JSONLoader.VERSION = '0.0.1';
+    JSONLoader.ID = 'JSONLoader';
 
     /**
      * Registers the plugin with `GConfig`.
      * @param  {Object} GConfig GConfig class.
      */
-    GCInterpolate.register = function(GConfig) {
+    JSONLoader.register = function(GConfig) {
 
         if (GConfig.PLUGINS[this.ID]) return true;
 
@@ -122,10 +133,10 @@
     /******************************************************
      * EXPOSE HELPER METHODS FOR UNIT TESTING.
     /******************************************************/
-    GCInterpolate.h = {};
-    GCInterpolate.h.template = _template;
-    GCInterpolate.h.needsInterpolation = _needsInterpolation;
-    GCInterpolate.h.resolvePropertyChain = _resolvePropertyChain;
+    JSONLoader.h = {};
+    JSONLoader.h.template = _template;
+    JSONLoader.h.needsInterpolation = _needsInterpolation;
+    JSONLoader.h.resolvePropertyChain = _resolvePropertyChain;
 
-    return GCInterpolate;
+    return JSONLoader;
 }));
