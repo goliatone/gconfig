@@ -135,7 +135,7 @@
     // CONSTRUCTOR
     ///////////////////////////////////////////////////
 
-    var _OPTIONS = {
+    var DEFAULTS = {
         namespace: 'app',
         autoinitialize: true
     };
@@ -149,7 +149,7 @@
 
         config = config || {};
 
-        config = _extend({}, GConfig.defaults || _OPTIONS, config);
+        config = _extend({}, this.constructor.DEFAULTS, config);
 
         this.data = config.data || {};
 
@@ -170,7 +170,8 @@
     /**
      * GConfig default config object.
      */
-    GConfig.defaults = _OPTIONS;
+    GConfig.defaults =
+    GConfig.DEFAULTS = DEFAULTS;
 
     /**
      * GConfig configuration loaders.
