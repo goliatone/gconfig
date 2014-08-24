@@ -174,7 +174,6 @@ define(['gconfig', 'gconfig.interpolate', 'jquery'], function(GConfig, GCInterpo
             var template = 'http://@{url.base}:@{url.port}/@{app.clientId}';
             var result = config.interpolate(template, data);
             expect(result).toEqual(expected);
-            console.warn('PEPERONE', result);
         })
     });
 });

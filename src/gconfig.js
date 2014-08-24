@@ -131,11 +131,22 @@
         return con;
     };
 
+    var _shimRequire = function(){
+        var loader = function(){};
+        try{
+            loader = require;
+        }catch(e){
+            console && console.warn('No require found');
+        }
+
+        return loader;
+    };
+
     ///////////////////////////////////////////////////
     // CONSTRUCTOR
     ///////////////////////////////////////////////////
 
-    var _OPTIONS = {
+    var DEFAULTS = {
         namespace: 'app',
         autoinitialize: true
     };
@@ -149,7 +160,7 @@
 
         config = config || {};
 
-        config = _extend({}, GConfig.defaults || _OPTIONS, config);
+        config = _extend({}, this.constructor.DEFAULTS, config);
 
         this.data = config.data || {};
 
@@ -170,7 +181,8 @@
     /**
      * GConfig default config object.
      */
-    GConfig.defaults = _OPTIONS;
+    GConfig.defaults =
+    GConfig.DEFAULTS = DEFAULTS;
 
     /**
      * GConfig configuration loaders.
@@ -185,14 +197,15 @@
     GConfig.PLUGINS = {};
 
     /**
+     * EXPERIMENTAL!
      * Module loader, defaults
      * to `require`
      * @type {Function}
      */
-    GConfig.loader = require;
+    GConfig.loader = _shimRequire();
 
 
-    GConfig.logger = console;
+    GConfig.logger = _shimConsole(console);
 
     /**
      * Require plugins and register on
