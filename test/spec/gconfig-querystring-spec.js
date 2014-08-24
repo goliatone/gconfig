@@ -81,6 +81,18 @@ define(['gconfig', 'gconfig.qstring', 'jquery'], function(GConfig, GConfigQS, $)
             var config = new GConfig();
             expect(config.filterAttributes(config.data)).toMatchObject(config.data);
         });
+
+        it('we should be able to override the filterAttributes method', function(){
+            var expected = {};
+            var queryString = '?app[name]=ThisShouldNotBeChanged';
+            var config = new GConfig({
+                filterAttributes:function(data){
+                    if(data.name) delete data.name;
+                    return data;
+                }
+            });
+            expect(config.filterAttributes(config.data)).toMatchObject(config.data);
+        });
     });
 
     describe('helper methods', function() {

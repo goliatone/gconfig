@@ -143,17 +143,38 @@ define(['gconfig', 'gconfig.interpolate', 'jquery'], function(GConfig, GCInterpo
             $('meta').remove();
         });
 
-        it('solve templates', function(){
+        it('override get to solve templates', function(){
             var config = new GConfig();
             var expected = 'http://localhost:9090';
             expect(config.get('endpoint', null, 'url')).toEqual(expected);
         });
-        it('solve templates', function(){
+
+        it('should add an interpolate method', function(){
             var config = new GConfig();
-            var expected = 'http://localhost:9090';
-            expect(config.get('endpoint', null, 'url')).toEqual(expected);
+            expect(config).toHaveMethods(['interpolate']);
         });
+
+        it('should add a solveDependencies method', function(){
+            var config = new GConfig();
+            expect(config).toHaveMethods(['solveDependencies']);
+        });
+
+        it('interpolate should solve template strings', function(){
+            var config = new GConfig();
+            var data = {
+                url:{
+                    base:'localhost',
+                    port:'9000'
+                },
+                app:{
+                    clientId:'123456'
+                }
+            };
+            var expected = 'http://localhost:9000/123456';
+            var template = 'http://@{url.base}:@{url.port}/@{app.clientId}';
+            var result = config.interpolate(template, data);
+            expect(result).toEqual(expected);
+            console.warn('PEPERONE', result);
+        })
     });
-
-
 });
