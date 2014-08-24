@@ -104,7 +104,7 @@
      * @param  {object} config Configuration object.
      */
     var GCInterpolate = {};
-    GCInterpolate.VERSION = '0.1.4';
+    GCInterpolate.VERSION = '0.1.5';
     GCInterpolate.ID = 'GCInterpolate';
 
     /**
@@ -131,18 +131,17 @@
         GConfig.prototype.get = function(key, devaultValue, namespace) {
             var value = _get.call(this, key, devaultValue, namespace);
             if (!_needsInterpolation(value)) return value;
-            return _template(value, this.data);
+            return this.interpolate(value, this.data);
         };
 
         /**
          * Explicit call to solve a templated expression
-         * @param  {String} key          Configuration key
-         * @param  {Mixed} defaultValue  Default value
-         * @param  {String} namespace    Namespace id
-         * @return {Mixed}
+         * @param  {String} template     Template string
+         * @param  {Object} data         Template context
+         * @return {String}
          */
-        GConfig.prototype.interpolate = function(key, defaultValue, namespace) {
-            return this.get(key, defaultValue, namespace);
+        GConfig.prototype.interpolate = function(template, data) {
+            return _template(template, data);
         };
 
         /**
