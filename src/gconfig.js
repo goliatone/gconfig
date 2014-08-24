@@ -70,6 +70,13 @@
         else if (typeof ext === 'object') _extend(src, ext);
     };
 
+    /**
+     *
+     * Based on [async-foreach]:https://github.com/cowboy/javascript-sync-async-foreach
+     * @param  {Array}   arr
+     * @param  {Function} done Callback
+     * @return {void}
+     */
     var _map = function(arr, done /*, ...rest*/ ) {
         var i = -1,
             len = arr.length,
@@ -104,7 +111,10 @@
      * available calls do not generate errors.
      * @return {Object} Console shim.
      */
-    var _shimConsole = function() {
+    var _shimConsole = function(console) {
+
+        if(console) return console;
+
         var empty = {},
             con = {},
             noop = function() {},
@@ -126,7 +136,6 @@
     ///////////////////////////////////////////////////
 
     var _OPTIONS = {
-        selector: 'meta[name^="::NAMESPACE::-"]',
         namespace: 'app',
         autoinitialize: true
     };
@@ -156,7 +165,7 @@
         if (config.autoinitialize) this.init(config);
     };
 
-    GConfig.VERSION = '0.6.13';
+    GConfig.VERSION = '0.6.14';
 
     /**
      * GConfig default config object.
@@ -193,12 +202,9 @@
      */
     GConfig.require = function() {
         var plugins = [].slice.call(arguments);
-        console.log('REQUIRE', plugins);
         this.loader(plugins, function() {
-            console.log('REQUIRE DONE', arguments);
             var plugins = [].slice.call(arguments);
             plugins.forEach(function(plugin) {
-                console.log('register', plugin);
                 plugin.register(GConfig);
             });
         });
@@ -258,7 +264,10 @@
             this.addResourceLoader(element, this[element].bind(this), index);
         }, this);
 
-        //Iterate over loaders, and execute each. It could be async.
+        /*
+         * Iterate over registered loaders, and execute each.
+         * Loaders can be async. Fire `onConfigLoaded` on done.
+         */
         _map(this.loaders, this.onConfigLoaded.bind(this), this);
     };
 
@@ -304,9 +313,20 @@
         }
     };
 
+    /**
+     * Handler called when configuration
+     * loaders have finalized loading and
+     * parsing
+     * @return {void}
+     * @private
+     * @event 'ondata'
+     */
     GConfig.prototype.onConfigLoaded = function() {
-        //Schedule for next tick, so that registered
-        //events get notified regardless.
+        /*
+         * Schedule for next tick, so that registered
+         * events get notified regardless if they are
+         * attached after creating an instance.
+         */
         setTimeout((function() {
             this.emit('ondata');
         }).bind(this), 0);
@@ -420,14 +440,13 @@
     /**
      * Simple log implementation.
      */
-    GConfig.prototype.logger = console || _shimConsole();
+    GConfig.prototype.logger = _shimConsole(console);
 
     /**
      * Stub emit function. User must extend
      * and implement to get events.
      */
-    GConfig.prototype.emit = function() {};
-
+    GConfig.prototype.emit = function(event, options) {};
 
     /**
      * TODO: We should do this at a global scope? Meaning before
