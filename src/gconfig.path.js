@@ -129,8 +129,8 @@
              * present in the key path.
              * If we do not have a namespace, then by making up
              * a non existent namespace and providing
-             * this.data to `getNamespace` we ensure that we
-             * append to this.data.
+             * `this.data` to `getNamespace` we ensure that we
+             * append to `this.data`.
              * @see getNamespace
              */
             if (namespace) {
