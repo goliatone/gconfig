@@ -349,7 +349,7 @@
      */
     var GConfigQS = {};
     GConfigQS.ID = 'GConfigQS';
-    GConfigQS.VERSION = '0.3.0';
+    GConfigQS.VERSION = '0.4.0';
 
     GConfigQS.register = function(GConfig) {
 
