@@ -51,7 +51,25 @@
     };
 
     //TODO: Remove!! Replace with custom method
-    var _each = $.each;
+    var _each = function(element, callback){
+        var i, value, total;
+
+        if(_isArray(element)){
+            total = element.length;
+            for(i = 0; i < total; i++){
+                value = callback.call(element[i], i, element[i])
+                if(value === false) break;
+            }
+
+            return element;
+        }
+
+        for(i in element){
+            value = callback.call(element[i], i, element[i]);
+            if(value === false) break;
+        }
+        return element;
+    };
 
     /**
      * TODO: Remove!! Replace with custom method
@@ -60,7 +78,20 @@
      * @return {Object}        Resulting object from
      *                         meging target to params.
      */
-    var _extend = $.extend;
+    var _extend = function extend(target) {
+        var sources = [].slice.call(arguments, 1);
+        sources.forEach(function(source) {
+            for (var property in source) {
+                if (source[property] && source[property].constructor &&
+                    source[property].constructor === Object) {
+                    target[property] = target[property] || {};
+                    target[property] = extend(target[property], source[property]);
+                } else target[property] = source[property];
+            }
+        });
+        return target;
+    };
+
 
     var encoders = {
         'encode array': {
@@ -293,7 +324,7 @@
                 var decoded = decodeKeyValue(key, value);
 
                 if (_isObject(decoded[1])) {
-                    _extend(true, decodedObject, decoded[1]);
+                    _extend(decodedObject, decoded[1]);
                 } else {
                     decodedObject[decoded[0]] = decoded[1];
                 }
