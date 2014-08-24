@@ -176,7 +176,7 @@
         if (config.autoinitialize) this.init(config);
     };
 
-    GConfig.VERSION = '0.6.14';
+    GConfig.VERSION = '0.6.15';
 
     /**
      * GConfig default config object.
