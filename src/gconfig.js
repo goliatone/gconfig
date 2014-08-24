@@ -131,6 +131,17 @@
         return con;
     };
 
+    var _shimRequire = function(){
+        var loader = function(){};
+        try{
+            loader = require;
+        }catch(e){
+            console && console.warn('No require found');
+        }
+
+        return loader;
+    };
+
     ///////////////////////////////////////////////////
     // CONSTRUCTOR
     ///////////////////////////////////////////////////
@@ -186,14 +197,15 @@
     GConfig.PLUGINS = {};
 
     /**
+     * EXPERIMENTAL!
      * Module loader, defaults
      * to `require`
      * @type {Function}
      */
-    GConfig.loader = require;
+    GConfig.loader = _shimRequire();
 
 
-    GConfig.logger = console;
+    GConfig.logger = _shimConsole(console);
 
     /**
      * Require plugins and register on
