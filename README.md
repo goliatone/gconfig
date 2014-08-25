@@ -6,7 +6,7 @@ Hierarchical configuration management utility. It provides and facilitates aggre
 
 GConfig lets you define a set of default options, environment options, and runtime flags each overriding the previous.
 
-One idea behind of the library is that of single responsibility, making use of functionality such as logging or events but leaving the implementation for the developer.
+One idea behind the library is that of single responsibility, making use of functionality such as logging or events but leaving the implementation to the developer.
 
 **NOTE**:
 There is a [grunt task][grunt-gconfig] to generate HTML metadata configuration options to be consumed for GConfig. Configurations are loaded from JSON files and you can specify different environments.
