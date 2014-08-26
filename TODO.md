@@ -48,11 +48,6 @@ console.log(config.widget.id) //widgetId
 
 Should default namespace be merged into the `config` object?!
 
-
-Async forEach:
-http://stackoverflow.com/questions/17860089/array-and-asynchronous-function-callback
-http://zef.me/3420/async-foreach-in-javascript
-
 ## PLUGINS:
 - Plugins should have an option to autoregister on load.
 - Plugins should be attached before we create any instances.
@@ -61,3 +56,7 @@ http://zef.me/3420/async-foreach-in-javascript
 ## TESTING
 How do we test plugins? We should test the plugin code, but also make sure that when attached they do not break `GConfig` tests.
 We could have an autoregister option so that when we run tests, we directly attach plugins that are loaded.
+
+TODO:
+Handle default config object.
+http://typicode.github.io/pegasus/
