@@ -113,7 +113,7 @@
      */
     var _shimConsole = function(console) {
 
-        if(console) return console;
+        if (console) return console;
 
         var empty = {},
             con = {},
@@ -131,11 +131,11 @@
         return con;
     };
 
-    var _shimRequire = function(){
-        var loader = function(){};
-        try{
+    var _shimRequire = function() {
+        var loader = function() {};
+        try {
             loader = require;
-        }catch(e){
+        } catch (e) {
             console && console.warn('No require found');
         }
 
@@ -182,7 +182,7 @@
      * GConfig default config object.
      */
     GConfig.defaults =
-    GConfig.DEFAULTS = DEFAULTS;
+        GConfig.DEFAULTS = DEFAULTS;
 
     /**
      * GConfig configuration loaders.
@@ -423,6 +423,11 @@
         if (!(namespace in this.data) || !(key in this.data[namespace]))
             return defaultValue;
         return this.data[namespace][key];
+    };
+
+    GConfig.prototype.has = function(key, namespace) {
+        namespace || (namespace = this.namespace);
+        return (namespace in this.data) && (key in this.data[namespace]);
     };
 
     /**
