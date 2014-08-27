@@ -1,10 +1,10 @@
 'use strict';
 var lrSnippet = require('grunt-contrib-livereload/lib/utils').livereloadSnippet;
-var mountFolder = function (connect, dir) {
+var mountFolder = function(connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
@@ -14,7 +14,7 @@ module.exports = function (grunt) {
         src: 'src',
         dist: 'dist',
         libs: 'lib',
-        example:'examples'
+        example: 'examples'
     };
 
     try {
@@ -23,8 +23,8 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         config: config,
-        livereload:{
-            port: 35723
+        livereload: {
+            port: 35333
         },
         watch: {
             livereload: {
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
             },
             livereload: {
                 options: {
-                    middleware: function (connect) {
+                    middleware: function(connect) {
                         return [
                             lrSnippet,
                             mountFolder(connect, '.tmp'),
@@ -57,8 +57,8 @@ module.exports = function (grunt) {
             },
             test: {
                 options: {
-                    port:4545,
-                    middleware: function (connect) {
+                    port: 4545,
+                    middleware: function(connect) {
                         return [
                             mountFolder(connect, '.tmp'),
                             mountFolder(connect, 'test')
@@ -66,7 +66,7 @@ module.exports = function (grunt) {
                     }
                 }
             },
-            dev:{
+            dev: {
                 options: {}
             }
         },
@@ -106,9 +106,9 @@ module.exports = function (grunt) {
             unit: {
                 reporters: 'dots'
             },
-            debug:{
-                singleRun:false,
-                browsers:['Chrome']
+            debug: {
+                singleRun: false,
+                browsers: ['Chrome']
             },
             ci: {
                 singleRun: true,
@@ -163,15 +163,15 @@ module.exports = function (grunt) {
         'string-replace': {
             version: {
                 files: {
-                    'src/gconfig.js':'src/gconfig.js'    
+                    'src/gconfig.js': 'src/gconfig.js'
                 },
-            options: {
-              replacements: [{
-                pattern: /GConfig\.VERSION\s*=\s*'.*';/g,
-                replacement: 'GConfig\.VERSION = \'<%= pkg.version %>\';'
-              }]
+                options: {
+                    replacements: [{
+                        pattern: /GConfig\.VERSION\s*=\s*'.*';/g,
+                        replacement: 'GConfig\.VERSION = \'<%= pkg.version %>\';'
+                    }]
+                }
             }
-          }
         },
         pkg: grunt.file.readJSON('package.json')
     });
