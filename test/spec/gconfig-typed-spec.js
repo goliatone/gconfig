@@ -13,23 +13,22 @@ define(['gconfig', 'gconfig.typed', 'jquery'], function(GConfig, GCTyped, $) {
         '<meta name="app:asBoolFalse" content="false">',
         '<meta name="app:asInt" content="9090">',
         '<meta name="app:asNumber" content="3.14159">',
-        '<meta name="app:asArray" content="[1,2,\"tres\",true]">',
-        '<meta name="app:asObject" content=\'{"a":1,"b":2,"c":3}\'>'
+        //spaces matter!
+        '<meta name="app:asArray" content=\'[1, 2, "tres", true]\'>',
+        '<meta name="app:asObject" content=\'{"a":1, "b":2, "c":3}\'>'
     ].join('');
 
     var meta = {
         app:{
-            asBoolTrue:true,
-            asBoolTrueUppercase:true,
-            asBoolFalse:false,
-            asInt:9090,
-            asNumber:3.1415,
-            asArray:[1,2,"tres", true],
-            asObject:{
-                a:1,
-                b:2,
-                c:3
-            }
+            asBoolTrue:'true',
+            asBoolTrueUppercase:'TRUE',
+            asBoolFalse:'false',
+            asInt:'9090',
+            asNumber:'3.14159',
+            //spaces matter!
+            asArray:'[1, 2, "tres", true]',
+            //spaces matter!
+            asObject:'{"a":1, "b":2, "c":3}'
         }
     };
 
@@ -60,6 +59,7 @@ define(['gconfig', 'gconfig.typed', 'jquery'], function(GConfig, GCTyped, $) {
 
         it('GConfig should load expected meta', function(){
             var config = new GConfig();
+            //spaces matter!
             expect(config.data).toMatchObject(meta);
         });
     });
@@ -92,28 +92,32 @@ define(['gconfig', 'gconfig.typed', 'jquery'], function(GConfig, GCTyped, $) {
             expect(config.asBool('asBoolDefault')).toEqual(false);
         });
 
-        it('asBool, defaults to false', function(){
+        it('asBool, returns specified default value when no valid namespace', function(){
             expect(config.asBool('asBoolDefault', true, 'nonthing')).toEqual(true);
         });
 
-        it('asBool, defaults to false', function(){
+        it('asBool, returns specified default value when no valid namespace', function(){
             expect(config.asBool('asBoolDefault', false, 'nonthing')).toEqual(false);
         });
 
         it('asInt, return integer from string', function(){
-            expect(config.asBool('asInt')).toEqual(meta.app.asInt);
+            var expected = parseInt(meta.app.asInt);
+            expect(config.asInt('asInt')).toEqual(expected);
         });
 
-        it('asNumber, return integer from string', function(){
-            expect(config.asBool('asNumber')).toEqual(meta.app.asNumber);
+        it('asNumber, return number from string', function(){
+            var expected = parseFloat(meta.app.asNumber);
+            expect(config.asNumber('asNumber')).toEqual(expected);
         });
 
-        it('asArray, return integer from string', function(){
-            expect(config.asBool('asArray')).toMatchObject(meta.app.asArray);
+        it('asArray, return array from string', function(){
+            var expected = JSON.parse(meta.app.asArray);
+            expect(config.asArray('asArray')).toMatchObject(expected);
         });
 
-        it('asObject, return integer from string', function(){
-            expect(config.asBool('asObject')).toMatchObject(meta.app.asObject);
+        it('asObject, return object from string', function(){
+            var expected = JSON.parse(meta.app.asObject);
+            expect(config.asObject('asObject')).toMatchObject(expected);
         });
     });
 });
