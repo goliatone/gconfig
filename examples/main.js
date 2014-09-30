@@ -5,6 +5,7 @@ requirejs.config({
         'jquery': 'jquery/jquery',
         'gconfig': 'gconfig',
         'gconfig.path': 'gconfig.path',
+        'gconfig.typed': 'gconfig.typed',
         'gconfig.interpolate': 'gconfig.interpolate',
         'gconfig.qstring': 'gconfig.qstring'
     }
@@ -13,6 +14,7 @@ requirejs.config({
 define(function(require) {
     var GConfig = require('gconfig'),
         GCPPath = require('gconfig.path'),
+        GCTyped = require('gconfig.typed'),
         GConfigQS = require('gconfig.qstring'),
         GCInterpolate = require('gconfig.interpolate'),
         $ = require('jquery');
@@ -44,7 +46,8 @@ define(function(require) {
         });
     };
 
-    GConfig.extend(GCPPath, GConfigQS, GCInterpolate);
+    console.log('GCTyped', GCTyped)
+    GConfig.extend(GCPPath, GConfigQS, GCInterpolate, GCTyped);
 
     var config = new GConfig({
         loaders: [jsonLoader]
