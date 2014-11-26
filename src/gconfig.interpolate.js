@@ -86,7 +86,8 @@
             return _resolvePropertyChain(context, prop, otag + prop + ctag);
         }
 
-        return template.replace(/@{([^}\r\n]*)}/g, replaceTokens);
+        return template.replace(/@{([^}\r\n]*)}/g, replaceTokens)
+                       .replace(/\\./g, '.');
     };
 
     var _needsInterpolation = function(key) {
@@ -104,7 +105,7 @@
      * @param  {object} config Configuration object.
      */
     var GCInterpolate = {};
-    GCInterpolate.VERSION = '0.1.5';
+    GCInterpolate.VERSION = '0.1.6';
     GCInterpolate.ID = 'GCInterpolate';
 
     /**
