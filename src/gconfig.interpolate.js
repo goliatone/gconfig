@@ -110,7 +110,7 @@
      * @param  {object} config Configuration object.
      */
     var GCInterpolate = {};
-    GCInterpolate.VERSION = '0.1.6';
+    GCInterpolate.VERSION = '0.1.7';
     GCInterpolate.ID = 'GCInterpolate';
     GCInterpolate.DEFAULTS = DEFAULTS;
     /**
