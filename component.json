@@ -1,6 +1,6 @@
 {
   "name": "gconfig",
-  "version": "0.6.17",
+  "version": "0.6.18",
   "main": "./src/gconfig.js",
   "ignore": [
     "**/.*"
@@ -9,6 +9,5 @@
     "jquery": "~1.9.1",
     "requirejs": "~2.1.4"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
