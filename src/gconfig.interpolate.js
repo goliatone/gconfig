@@ -39,6 +39,11 @@
 }(this, 'gconfig.interpolate', function() {
 
 
+    var DEFAULTS = {
+        otag: '@{',
+        ctag: '}'
+    };
+
     /**
      * Parse query string into object.
      * @param   {String|undefined} query String to parse
@@ -75,8 +80,7 @@
         if (!template) return '';
         if (!context) return template;
 
-        otag = otag || '@{';
-        ctag = ctag || '}';
+        otag = otag || GCInterpolate.DEFAULTS.otag, ctag = ctag || GCInterpolate.DEFAULTS.ctag;
 
         template = template.split('.').join('\\.');
 
@@ -86,13 +90,14 @@
             return _resolvePropertyChain(context, prop, otag + prop + ctag);
         }
 
-        return template.replace(/@{([^}\r\n]*)}/g, replaceTokens)
+        return template.replace(new RegExp(otag + '([^}\\r\\n]*)' + ctag, 'g'), replaceTokens)
                        .replace(/\\./g, '.');
     };
 
-    var _needsInterpolation = function(key) {
+    var _needsInterpolation = function(key, otag, ctag) {
+        otag = otag || GCInterpolate.DEFAULTS.otag, ctag = ctag || GCInterpolate.DEFAULTS.ctag;
         if (!key || typeof key !== 'string') return false;
-        return !!key.match(/@{([^}\r\n]*)}/g);
+        return !!key.match(new RegExp(otag + '([^}\\r\\n]*)' + ctag, 'g'));
     };
 
     ///////////////////////////////////////////////////
@@ -105,9 +110,9 @@
      * @param  {object} config Configuration object.
      */
     var GCInterpolate = {};
-    GCInterpolate.VERSION = '0.1.6';
+    GCInterpolate.VERSION = '0.1.7';
     GCInterpolate.ID = 'GCInterpolate';
-
+    GCInterpolate.DEFAULTS = DEFAULTS;
     /**
      * Registers the plugin with `GConfig`.
      * @param  {Object} GConfig GConfig class.
